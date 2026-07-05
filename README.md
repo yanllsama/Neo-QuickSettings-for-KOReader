@@ -25,4 +25,4 @@ A highly customizable, powerful, and visually rich quick settings panel plugin f
 Once installed, open the QuickSettings panel. To customize your experience, long-press any button or tap the "Settings" gear icon to enter the **Appearance Options** and **Add/Remove Buttons** menus.
 
 ---
-*Built with ❤️ for the KOReader community.*
+*Built for the KOReader community.*
