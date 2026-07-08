@@ -29,7 +29,7 @@ Once installed, open the QuickSettings panel. To customize your experience, long
 
 This project is open-source and built upon the incredible work of the KOReader developer community. Special thanks to the following developers whose code, icons, and ideas heavily inspired and formed the foundation of **Neo QuickSettings**:
 
-* **[renandeivison](https://github.com)** - For the amazing UI layout, creative icons, and structural codebase.
+* **[renandeivison]((https://github.com/renandeivison))** - For the amazing UI layout, creative icons, and structural codebase.
 * **AnthonyGress** - The original developer of Zenui, which inspired the core menu mechanics.
 * **qewer33** - For creating the original quicksettings patch that started it all.
 
