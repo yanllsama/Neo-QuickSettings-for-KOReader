@@ -25,4 +25,13 @@ A highly customizable, powerful, and visually rich quick settings panel plugin f
 Once installed, open the QuickSettings panel. To customize your experience, long-press any button or tap the "Settings" gear icon to enter the **Appearance Options** and **Add/Remove Buttons** menus.
 
 ---
-*Built for the KOReader community.*
+## 📌 Credits & Acknowledgments
+
+This project is open-source and built upon the incredible work of the KOReader developer community. Special thanks to the following developers whose code, icons, and ideas heavily inspired and formed the foundation of **Neo QuickSettings**:
+
+* **[renandeivison](https://github.com)** - For the amazing UI layout, creative icons, and structural codebase.
+* **AnthonyGress** - The original developer of Zenui, which inspired the core menu mechanics.
+* **qewer33** - For creating the original quicksettings patch that started it all.
+
+Thank you all for keeping the KOReader community alive, open, and inspiring! 🚀
+
