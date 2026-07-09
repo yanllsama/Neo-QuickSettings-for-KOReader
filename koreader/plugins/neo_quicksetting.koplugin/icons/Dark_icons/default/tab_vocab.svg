@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="800px" height="800px" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <path fill="none" d="M0 0H48V48H0z"/>
+  <path
+    fill="none"
+    stroke="#000000"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    d="M22 4c8.136 0 14.852 6.072 15.868 13.93l4.5 7.078c.296.466.236 1.16-.45 1.456L38 28.14V34c0 2.21-1.79 4-4 4h-3.998L30 44H12v-7.388c0-2.36-.872-4.594-2.488-6.61C7.314 27.262 6 23.784 6 20c0-8.836 7.164-16 16-16z"/>
+  <line stroke="#000000" stroke-width="2" stroke-linecap="round" x1="22" y1="14" x2="22" y2="26"/>
+  <line stroke="#000000" stroke-width="2" stroke-linecap="round" x1="16" y1="20" x2="28" y2="20"/>
+</svg>
