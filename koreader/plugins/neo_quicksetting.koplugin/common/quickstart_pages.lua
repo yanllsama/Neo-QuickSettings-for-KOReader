@@ -1,0 +1,918 @@
+
+local M = {}
+
+local _ = require("gettext")
+local T = require("ffi/util").template
+local paths = require("common/paths")
+
+local _plugin_root = require("common/plugin_root") or ""
+
+local function img(rel)
+    return _plugin_root .. "/images/quickstart/" .. rel
+end
+
+local function loadQuickstartCovers(n)
+    local ok, BIM = pcall(require, "bookinfomanager")
+    if not ok or type(BIM) ~= "table" or type(BIM.getBookInfo) ~= "function" then
+        return {}
+    end
+    local lfs    = require("libs/libkoreader-lfs")
+    local ok_ds, DocSettings = pcall(require, "docsettings")
+    local covers = {}
+    local seen   = {}
+
+    local function try_add(path)
+        if #covers >= n or not path or seen[path] then return end
+        seen[path] = true
+        if lfs.attributes(path, "mode") ~= "file" then return end
+        local info = BIM:getBookInfo(path, true)
+        if info and info.has_cover and info.cover_bb
+                and info.cover_fetched and not info.ignore_cover then
+            local progress, status = nil, nil
+            if ok_ds then
+                pcall(function()
+                    local ds = DocSettings:open(path)
+                    progress = ds:readSetting("percent_finished")
+                    local summary = ds:readSetting("summary")
+                    status = summary and summary.status
+                end)
+            end
+            table.insert(covers, { bb = info.cover_bb:copy(), w = info.cover_w, h = info.cover_h, progress = progress, status = status, title = info.title, authors = info.authors, pages = info.pages })
+        end
+    end
+
+    local rh_ok, ReadHistory = pcall(require, "readhistory")
+    if rh_ok and ReadHistory and ReadHistory.hist then
+        for _, entry in ipairs(ReadHistory.hist) do
+            if #covers >= n then break end
+            try_add(entry.file)
+        end
+    end
+
+    if #covers < n then
+        local home = paths.getHomeDir()
+        if home and lfs.attributes(home, "mode") == "directory" then
+            local file_list = {}
+            for fname in lfs.dir(home) do
+                if fname ~= "." and fname ~= ".." then
+                    local fpath = home .. "/" .. fname
+                    if lfs.attributes(fpath, "mode") == "file" then
+                        table.insert(file_list, fpath)
+                    end
+                end
+            end
+            table.sort(file_list)
+            for _, path in ipairs(file_list) do
+                if #covers >= n then break end
+                try_add(path)
+            end
+        end
+    end
+
+    return covers
+end
+
+local function paintPentagon(bb, bx, by, bw, bh, color)
+    local rect_h = math.floor(bh * 30 / 42)
+    local tip_h  = bh - rect_h
+    bb:paintRect(bx, by, bw, rect_h, color)
+    for row = 0, tip_h - 1 do
+        local frac = (row + 1) / tip_h
+        local rw   = math.max(2, math.floor(bw * (1 - frac)))
+        local rx   = bx + math.floor((bw - rw) / 2)
+        bb:paintRect(rx, by + rect_h + row, rw, 1, color)
+    end
+end
+
+local function paintCheck(bb, bx, by, bw, bh, color)
+    local tk = math.max(2, math.floor(math.min(bw, bh) / 8))
+    local function drawLine(x0, y0, x1, y1)
+        local steps = math.max(math.abs(x1 - x0), math.abs(y1 - y0))
+        if steps == 0 then steps = 1 end
+        for i = 0, steps do
+            local t = i / steps
+            bb:paintRect(math.floor(x0 + t*(x1-x0)), math.floor(y0 + t*(y1-y0)), tk, tk, color)
+        end
+    end
+    drawLine(bx+math.floor(bw*0.08), by+math.floor(bh*0.62), bx+math.floor(bw*0.30), by+math.floor(bh*0.82))
+    drawLine(bx+math.floor(bw*0.30), by+math.floor(bh*0.82), bx+math.floor(bw*0.82), by+math.floor(bh*0.18))
+end
+
+local function paintCoverBadge(canvas, Blitbuffer, Font, TextWidget, Screen,
+                               cell_x, cell_y, cell_w, progress, status)
+    local do_check = (status == "complete") or (progress and progress >= 1.0)
+    local do_pause = not do_check and (status == "abandoned")
+    local do_pct   = not do_check and not do_pause and (progress and progress > 0)
+    if not (do_check or do_pause or do_pct) then return end
+    local badge_size = math.max(Screen:scaleBySize(16), math.floor(cell_w * 0.14))
+    local bw = math.floor(badge_size * 1.2)
+    local bh = math.floor(badge_size * 1.1)
+    local bdg_x = cell_x + cell_w - bw - math.floor(bw * 0.25)
+    local bdg_y = cell_y + 2
+    paintPentagon(canvas, bdg_x - 2, bdg_y - 2, bw + 4, bh + 4, Blitbuffer.COLOR_BLACK)
+    paintPentagon(canvas, bdg_x, bdg_y, bw, bh, Blitbuffer.COLOR_LIGHT_GRAY)
+    local rect_h = math.floor(bh * 30 / 42)
+    local pad_x  = math.floor(bw * 0.12)
+    local pad_y  = math.floor(rect_h * 0.15)
+    local icon_w = bw - 2 * pad_x
+    local icon_h = rect_h - 2 * pad_y
+    if do_check then
+        local sq   = math.min(icon_w, icon_h)
+        paintCheck(canvas,
+            bdg_x + pad_x + math.floor((icon_w - sq) / 2),
+            bdg_y + pad_y + math.floor((icon_h - sq) / 2),
+            sq, sq, Blitbuffer.COLOR_BLACK)
+    elseif Font and TextWidget then
+        local font_sz = do_pause
+            and math.max(7, math.floor(badge_size * 0.40))
+            or  math.max(7, math.floor(badge_size * 0.24))
+        local tw = TextWidget:new{
+            text    = do_pause and "\u{F0150}" or (math.floor(100 * progress) .. "%"),
+            face    = Font:getFace("cfont", font_sz),
+            bold    = not do_pause,
+            fgcolor = Blitbuffer.COLOR_BLACK,
+            padding = 0,
+        }
+        local tw_sz = tw:getSize()
+        tw:paintTo(canvas,
+            bdg_x + math.floor((bw     - tw_sz.w) / 2),
+            bdg_y + math.floor((rect_h - tw_sz.h) / 2))
+        tw:free()
+    end
+end
+
+local function buildHomeIconBB(avail_w)
+    local ok_bb,  Blitbuffer = pcall(require, "ffi/blitbuffer")
+    local ok_iw,  IconWidget = pcall(require, "ui/widget/iconwidget")
+    local ok_dev, Device     = pcall(require, "device")
+    if not (ok_bb and ok_iw and ok_dev) then return nil end
+    local ok_u, utils = pcall(require, "common/utils")
+    local Screen   = Device.screen
+    local BTN_SZ   = Screen:scaleBySize(160)
+    local BORDER   = Screen:scaleBySize(3)
+    local ICO_SZ   = math.floor(BTN_SZ * 0.52)
+    local canvas_h = BTN_SZ + Screen:scaleBySize(40)
+    local canvas   = Blitbuffer.new(avail_w, canvas_h, Blitbuffer.TYPE_BB8)
+    canvas:fill(Blitbuffer.COLOR_WHITE)
+    local r  = math.floor(BTN_SZ / 2)
+    local cx = math.floor(avail_w / 2)
+    local cy = math.floor(canvas_h / 2)
+    for dy = -r, r do
+        local hw = math.floor(math.sqrt(r*r - dy*dy) + 0.5)
+        if hw > 0 then canvas:paintRect(cx - hw, cy + dy, hw*2, 1, Blitbuffer.COLOR_BLACK) end
+    end
+    local ir = r - BORDER
+    for dy = -ir, ir do
+        local hw = math.floor(math.sqrt(ir*ir - dy*dy) + 0.5)
+        if hw > 0 then canvas:paintRect(cx - hw, cy + dy, hw*2, 1, Blitbuffer.COLOR_WHITE) end
+    end
+    local icon_path = ok_u and utils.resolveIcon(_plugin_root .. "/icons/", "library")
+    pcall(function()
+        local ico = IconWidget:new{
+            file   = icon_path or nil,
+            icon   = icon_path and nil or "library",
+            width  = ICO_SZ,
+            height = ICO_SZ,
+        }
+        local isz = ico:getSize()
+        ico:paintTo(canvas, cx - math.floor(isz.w / 2), cy - math.floor(isz.h / 2))
+        ico:free()
+    end)
+    return canvas
+end
+
+local function buildContextMenuBB(slot_w, slot_h, cover_info)
+    local ok_bb,  Blitbuffer  = pcall(require, "ffi/blitbuffer")
+    local ok_dev, Device      = pcall(require, "device")
+    local ok_bd,  ButtonDialog = pcall(require, "ui/widget/buttondialog")
+    if not (ok_bb and ok_dev and ok_bd) then return nil end
+
+    local Screen = Device.screen
+    local _      = require("gettext")
+
+    local dlg_w = math.floor(slot_w * 0.85)
+
+    local header_widget
+    pcall(function()
+        local SizeR           = require("ui/size")
+        local Font            = require("ui/font")
+        local Geom            = require("ui/geometry")
+        local FrameContainer  = require("ui/widget/container/framecontainer")
+        local HorizontalGroup = require("ui/widget/horizontalgroup")
+        local HorizontalSpan  = require("ui/widget/horizontalspan")
+        local LeftContainer   = require("ui/widget/container/leftcontainer")
+        local TextWidget      = require("ui/widget/textwidget")
+        local VerticalGroup   = require("ui/widget/verticalgroup")
+        local VerticalSpan    = require("ui/widget/verticalspan")
+        local Widget          = require("ui/widget/widget")
+
+        local border      = SizeR.border.thin
+        local gap         = Screen:scaleBySize(8)
+        local avail_inner = dlg_w
+            - 2 * (SizeR.border.window + SizeR.padding.button)
+            - 2 * (SizeR.padding.default + SizeR.margin.default)
+        local cover_max_w = Screen:scaleBySize(90)
+        local cover_max_h = Screen:scaleBySize(140)
+        local text_col_w  = math.max(avail_inner - cover_max_w - 2 * border - gap,
+                                     Screen:scaleBySize(60))
+
+        local cover_frame
+        if cover_info then
+            local ok_iw,  ImageWidget     = pcall(require, "ui/widget/imagewidget")
+            local ok_bim, BookInfoManager = pcall(require, "bookinfomanager")
+            if ok_iw and ok_bim then
+                local _, _, sf = BookInfoManager.getCachedCoverSize(
+                    cover_info.w, cover_info.h, cover_max_w, cover_max_h)
+                cover_frame = FrameContainer:new{
+                    padding    = 0,
+                    bordersize = border,
+                    ImageWidget:new{
+                        image            = cover_info.bb,
+                        image_disposable = false,
+                        scale_factor     = sf,
+                    },
+                }
+            end
+        end
+        if not cover_frame then
+            cover_frame = FrameContainer:new{
+                padding    = 0,
+                bordersize = border,
+                background = Blitbuffer.COLOR_LIGHT_GRAY,
+                Widget:new{ dimen = Geom:new{ w = cover_max_w, h = cover_max_h } },
+            }
+        end
+
+        local vstack = VerticalGroup:new{ align = "left" }
+        table.insert(vstack, TextWidget:new{
+            text      = (cover_info and cover_info.title) or _("Book Title"),
+            face      = Font:getFace("cfont", 20),
+            bold      = true,
+            max_width = text_col_w,
+        })
+        if cover_info and cover_info.authors then
+            table.insert(vstack, VerticalSpan:new{ width = Screen:scaleBySize(2) })
+            table.insert(vstack, TextWidget:new{
+                text      = cover_info.authors,
+                face      = Font:getFace("cfont", 17),
+                max_width = text_col_w,
+            })
+        end
+
+        local framed_h = cover_max_h + 2 * border
+        header_widget = LeftContainer:new{
+            dimen = Geom:new{ w = avail_inner, h = framed_h },
+            HorizontalGroup:new{
+                align = "center",
+                cover_frame,
+                HorizontalSpan:new{ width = gap },
+                vstack,
+            },
+        }
+    end)
+
+    local buttons = {
+        {{ text = "\u{F02FD}  " .. _("Details"),                              align = "left", callback = function() end }},
+        {{ text = "\u{F01BE}  " .. _("Move"),                                 align = "left", callback = function() end }},
+        {{ text = "\u{F04CE}  " .. _("Add to collection") .. "  \u{25B6}",   align = "left", callback = function() end }},
+        {{ text = "\u{F0B64}  " .. _("Read status") .. "  \u{25B6}",         align = "left", callback = function() end }},
+        {{ text = "\u{F090C}  " .. _("Edit") .. "  \u{25B6}",                align = "left", callback = function() end }},
+    }
+
+    local dialog = ButtonDialog:new{
+        buttons        = buttons,
+        width          = dlg_w,
+        dismissable    = false,
+        _added_widgets = header_widget and { header_widget } or nil,
+    }
+
+    local sz = dialog:getSize()
+    local canvas = Blitbuffer.new(slot_w, slot_h, Blitbuffer.TYPE_BB8)
+    canvas:fill(Blitbuffer.COLOR_WHITE)
+    local dx = math.floor((slot_w - sz.w) / 2)
+    local dy = math.floor((slot_h - sz.h) / 2)
+    pcall(function()
+        dialog:paintTo(canvas, dx, dy)
+    end)
+    return canvas
+end
+
+local function buildNeoButtonBB(avail_w)
+    local ok_bb,  Blitbuffer = pcall(require, "ffi/blitbuffer")
+    local ok_iw,  IconWidget = pcall(require, "ui/widget/iconwidget")
+    local ok_dev, Device     = pcall(require, "device")
+    if not (ok_bb and ok_iw and ok_dev) then return nil end
+    local ok_u, utils = pcall(require, "common/utils")
+    local Screen   = Device.screen
+    local BTN_SZ   = Screen:scaleBySize(160)
+    local BORDER   = Screen:scaleBySize(3)
+    local ICO_SZ   = math.floor(BTN_SZ * 0.52)
+    local canvas_h = BTN_SZ + Screen:scaleBySize(40)
+    local canvas   = Blitbuffer.new(avail_w, canvas_h, Blitbuffer.TYPE_BB8)
+    canvas:fill(Blitbuffer.COLOR_WHITE)
+    local r  = math.floor(BTN_SZ / 2)
+    local cx = math.floor(avail_w / 2)
+    local cy = math.floor(canvas_h / 2)
+    for dy = -r, r do
+        local hw = math.floor(math.sqrt(r*r - dy*dy) + 0.5)
+        if hw > 0 then canvas:paintRect(cx - hw, cy + dy, hw*2, 1, Blitbuffer.COLOR_BLACK) end
+    end
+    local ir = r - BORDER
+    for dy = -ir, ir do
+        local hw = math.floor(math.sqrt(ir*ir - dy*dy) + 0.5)
+        if hw > 0 then canvas:paintRect(cx - hw, cy + dy, hw*2, 1, Blitbuffer.COLOR_WHITE) end
+    end
+    local icon_path = ok_u and utils.resolveIcon(_plugin_root .. "/icons/", "quick_neo")
+    pcall(function()
+        local ico = IconWidget:new{
+            file   = icon_path or nil,
+            icon   = icon_path and nil or "quick_neo",
+            width  = ICO_SZ,
+            height = ICO_SZ,
+        }
+        local isz = ico:getSize()
+        ico:paintTo(canvas, cx - math.floor(isz.w / 2), cy - math.floor(isz.h / 2))
+        ico:free()
+    end)
+    return canvas
+end
+
+local function buildMosaicBB(covers, avail_w)
+    local ok_bb,  Blitbuffer  = pcall(require, "ffi/blitbuffer")
+    local ok_iw,  ImageWidget = pcall(require, "ui/widget/imagewidget")
+    local ok_dev, Device      = pcall(require, "device")
+    if not (ok_bb and ok_iw and ok_dev) then return nil end
+    local ok_font, Font       = pcall(require, "ui/font")
+    local ok_tw,  TextWidget  = pcall(require, "ui/widget/textwidget")
+    local Screen = Device.screen
+    local night  = Screen.night_mode
+    local PAD    = Screen:scaleBySize(8)
+    local GAP    = Screen:scaleBySize(6)
+    local cell_w = math.floor((avail_w - 2 * PAD - 2 * GAP) / 3)
+    local cell_h = math.floor(cell_w * 3 / 2)
+    local canvas = Blitbuffer.new(avail_w, cell_h + 2 * PAD, Blitbuffer.TYPE_BB8)
+    canvas:fill(Blitbuffer.COLOR_WHITE)
+    for i = 0, 2 do
+        local cx = PAD + i * (cell_w + GAP)
+        canvas:paintRect(cx, PAD, cell_w, cell_h, Blitbuffer.COLOR_GRAY_4)
+        local c = covers[i + 1]
+        if c then
+            pcall(function()
+                local iw = ImageWidget:new{
+                    image                 = c.bb,
+                    width                 = cell_w,
+                    height                = cell_h,
+                    scale_factor          = 0,
+                    image_disposable      = false,
+                    original_in_nightmode = false,
+                }
+                local isz = iw:getSize()
+                iw:paintTo(canvas,
+                    cx  + math.floor((cell_w - isz.w) / 2),
+                    PAD + math.floor((cell_h - isz.h) / 2))
+                iw:free()
+            end)
+            if night then canvas:invertRect(cx, PAD, cell_w, cell_h) end
+            pcall(paintCoverBadge, canvas, Blitbuffer,
+                ok_font and Font or nil, ok_tw and TextWidget or nil,
+                Screen, cx, PAD, cell_w, c.progress, c.status)
+        end
+    end
+    return canvas
+end
+
+local function buildListBB(covers, avail_w)
+    local ok_bb,  Blitbuffer  = pcall(require, "ffi/blitbuffer")
+    local ok_iw,  ImageWidget = pcall(require, "ui/widget/imagewidget")
+    local ok_dev, Device      = pcall(require, "device")
+    if not (ok_bb and ok_iw and ok_dev) then return nil end
+    local ok_font, Font       = pcall(require, "ui/font")
+    local ok_tw,  TextWidget  = pcall(require, "ui/widget/textwidget")
+    local Screen    = Device.screen
+    local night     = Screen.night_mode
+    local PAD       = Screen:scaleBySize(8)
+    local GAP       = Screen:scaleBySize(8)
+    local INNER_GAP = Screen:scaleBySize(10)
+    local thumb_w   = math.floor(avail_w * 0.28)
+    local thumb_h   = math.floor(thumb_w * 3 / 2)
+    local total_h   = 2 * thumb_h + GAP + 2 * PAD
+    local canvas    = Blitbuffer.new(avail_w, total_h, Blitbuffer.TYPE_BB8)
+    canvas:fill(Blitbuffer.COLOR_WHITE)
+    local text_x = PAD + thumb_w + INNER_GAP
+    local text_w = avail_w - text_x - PAD
+    for i = 0, 1 do
+        local ry = PAD + i * (thumb_h + GAP)
+        canvas:paintRect(PAD, ry, thumb_w, thumb_h, Blitbuffer.COLOR_GRAY_4)
+        local c = covers[i + 1]
+        if c then
+            pcall(function()
+                local iw = ImageWidget:new{
+                    image                 = c.bb,
+                    width                 = thumb_w,
+                    height                = thumb_h,
+                    scale_factor          = 0,
+                    image_disposable      = false,
+                    original_in_nightmode = false,
+                }
+                local isz = iw:getSize()
+                iw:paintTo(canvas,
+                    PAD + math.floor((thumb_w - isz.w) / 2),
+                    ry  + math.floor((thumb_h - isz.h) / 2))
+                iw:free()
+            end)
+            if night then canvas:invertRect(PAD, ry, thumb_w, thumb_h) end
+        end
+        if ok_font and ok_tw then
+            local ty = ry + Screen:scaleBySize(8)
+            local title_str = (c and c.title and c.title ~= "") and c.title or "Unknown Title"
+            local t_tw = TextWidget:new{
+                text    = title_str,
+                face    = Font:getFace("cfont", 17),
+                bold    = true,
+                width   = text_w,
+                padding = 0,
+            }
+            t_tw:paintTo(canvas, text_x, ty)
+            ty = ty + t_tw:getSize().h + Screen:scaleBySize(4)
+            t_tw:free()
+            local auth_str = (c and c.authors and c.authors ~= "") and c.authors or ""
+            if auth_str ~= "" then
+                local a_tw = TextWidget:new{
+                    text    = auth_str,
+                    face    = Font:getFace("cfont", 15),
+                    width   = text_w,
+                    padding = 0,
+                }
+                a_tw:paintTo(canvas, text_x, ty)
+                ty = ty + a_tw:getSize().h + Screen:scaleBySize(4)
+                a_tw:free()
+            end
+            if c and c.pages and c.pages > 0 then
+                local m_tw = TextWidget:new{
+                    text    = c.pages .. " pages",
+                    face    = Font:getFace("cfont", 14),
+                    fgcolor = Blitbuffer.COLOR_DARK_GRAY,
+                    width   = text_w,
+                    padding = 0,
+                }
+                m_tw:paintTo(canvas, text_x, ty)
+                m_tw:free()
+            end
+        else
+            canvas:paintRect(text_x, ry + math.floor(thumb_h * 0.25),
+                math.floor(text_w * 0.55), Screen:scaleBySize(10), Blitbuffer.COLOR_LIGHT_GRAY)
+            canvas:paintRect(text_x, ry + math.floor(thumb_h * 0.25) + Screen:scaleBySize(18),
+                math.floor(text_w * 0.35), Screen:scaleBySize(8), Blitbuffer.COLOR_LIGHT_GRAY)
+        end
+        if i < 1 then
+            canvas:paintRect(PAD, ry + thumb_h + math.floor(GAP / 2),
+                avail_w - 2 * PAD, 1, Blitbuffer.COLOR_LIGHT_GRAY)
+        end
+    end
+    return canvas
+end
+
+
+function M.build_install_pages(ctx)
+    local config = ctx.config
+    local plugin = ctx.plugin
+
+    local function save_and_apply(feature)
+        plugin:saveConfig()
+        local ok, apply_mod = pcall(require, "modules/settings/neo_settings_apply")
+        if ok and type(apply_mod.apply_feature_toggle) == "function" then
+            apply_mod.apply_feature_toggle(plugin, feature, config.features[feature] == true)
+        end
+    end
+
+    local builtin_presets = {}
+    pcall(function()
+        local bp_mod = require("config/screensaver_presets")
+        if type(bp_mod.get) == "function" then
+            builtin_presets = bp_mod.get(_plugin_root .. "/icons/")
+        end
+    end)
+
+    local footer_presets
+    pcall(function()
+        footer_presets = require("modules/reader/patches/reader_footer_presets")
+    end)
+
+
+    local function apply_screensaver_preset(preset)
+        if type(preset) ~= "table" then return end
+        local simple_keys = {
+            "screensaver_type",
+            "screensaver_img_background",
+            "screensaver_document_cover",
+            "screensaver_stretch_limit_percentage",
+        }
+        for _, k in ipairs(simple_keys) do
+            if preset[k] ~= nil then
+                G_reader_settings:saveSetting(k, preset[k])
+            end
+        end
+        if preset.screensaver_type == "cover" then
+            G_reader_settings:delSetting("screensaver_document_cover")
+        end
+        if preset.screensaver_show_message ~= nil then
+            if preset.screensaver_show_message then
+                G_reader_settings:makeTrue("screensaver_show_message")
+            else
+                G_reader_settings:makeFalse("screensaver_show_message")
+            end
+        end
+        if preset.screensaver_stretch_images ~= nil then
+            if preset.screensaver_stretch_images then
+                G_reader_settings:makeTrue("screensaver_stretch_images")
+            else
+                G_reader_settings:makeFalse("screensaver_stretch_images")
+            end
+        end
+    end
+
+    local function apply_footer_preset(preset)
+        if type(preset) ~= "table" then return end
+        if preset.footer then
+            local footer
+            local ok_u, util_mod = pcall(require, "util")
+            if ok_u and type(util_mod.tableDeepCopy) == "function" then
+                footer = util_mod.tableDeepCopy(preset.footer)
+            else
+                footer = {}
+                for k, v in pairs(preset.footer) do footer[k] = v end
+            end
+            footer.text_font_face = "NotoSans-Bold.ttf"
+            footer.text_font_bold = false
+            G_reader_settings:saveSetting("footer", footer)
+        end
+        if preset.reader_footer_mode ~= nil then
+            G_reader_settings:saveSetting("reader_footer_mode", preset.reader_footer_mode)
+        end
+        if preset.reader_footer_custom_text then
+            G_reader_settings:saveSetting("reader_footer_custom_text", preset.reader_footer_custom_text)
+        end
+        if preset.reader_footer_custom_text_repetitions then
+            G_reader_settings:saveSetting("reader_footer_custom_text_repetitions",
+                preset.reader_footer_custom_text_repetitions)
+        end
+        if preset.neo then
+            if type(config.reader_footer) ~= "table" then config.reader_footer = {} end
+            if preset.neo.verbose_chapter_time ~= nil then
+                config.reader_footer.verbose_chapter_time = preset.neo.verbose_chapter_time
+            end
+            plugin:saveConfig()
+        end
+    end
+
+    local function apply_display_mode(mode)
+        local ok_fm, FileManager = pcall(require, "apps/filemanager/filemanager")
+        local fm = ok_fm and FileManager and FileManager.instance
+        if fm and type(fm.onSetDisplayMode) == "function" then
+            pcall(fm.onSetDisplayMode, fm, mode)
+        else
+            local ok_bim, BookInfoManager = pcall(require, "bookinfomanager")
+            if ok_bim then
+                pcall(BookInfoManager.saveSetting, BookInfoManager,
+                    "filemanager_display_mode", mode)
+            end
+        end
+    end
+
+
+    local show_tabs = (type(config.navbar) == "table" and type(config.navbar.show_tabs) == "table")
+        and config.navbar.show_tabs or {}
+
+    local is_12h = true
+    local raw_12h = G_reader_settings:readSetting("twelve_hour_clock")
+    if raw_12h ~= nil then
+        is_12h = raw_12h ~= false
+    end
+
+
+    local pages = {
+        {
+            title       = _("Welcome to Neo UI"),
+            icon        = "neo_ui",
+            description = _("A minimal, clean, and simple interface for your e-reader.\n\nSwipe or tap Next to continue."),
+        },
+
+        {
+            title       = _("File Browser"),
+            image       = img("onboarding/library_covers.png"),
+            description = _("Clean, minimal library with mosaic cover art and list views, reduced clutter, and a streamlined context menu."),
+        },
+
+        {
+            title       = _("Context Menu"),
+            image       = img("onboarding/context_menu.png"),
+            description = _("Tap and hold any book or folder in your library to reveal details."),
+        },
+
+        {
+            title       = _("Authors & Series"),
+            image       = img("onboarding/authors.png"),
+            description = _("Browse your entire library organized by author or series.\nAccess these views anytime from the navigation bar."),
+        },
+
+        {
+            title       = _("Library View"),
+            choice_type = "radio",
+            choices     = {
+                { id = "mosaic", text = _("Mosaic - large cover thumbnails"),     image = img("onboarding/library_covers.png"), checked = true  },
+                { id = "list",   text = _("List - detailed titles and metadata"), image = img("onboarding/library_list.png"),   checked = false },
+            },
+            on_apply = function(sel)
+                if     sel["mosaic"] then apply_display_mode("mosaic_image")
+                elseif sel["list"]   then apply_display_mode("list_image_meta")
+                end
+            end,
+        },
+
+        {
+            title       = _("Navigation Bar"),
+            image       = img("onboarding/navbar.png"),
+            description = _("A simple tab-based bar at the bottom of your library.\nFully customizable to make it your own"),
+        },
+
+        {
+            title          = _("Navbar Tabs"),
+            description    = _("Choose which tabs appear in your navigation bar.\nYou can rearrange or adjust these anytime in Settings."),
+            choice_type    = "checkbox",
+            max_selections = 7,
+            choices        = {
+                { id = "continue",    text = _("Continue"),    checked = show_tabs["continue"]    == true },
+                { id = "history",     text = _("History"),     checked = show_tabs["history"]     == true },
+                { id = "favorites",   text = _("Favorites"),   checked = show_tabs["favorites"]   == true },
+                { id = "collections", text = _("Collections"), checked = show_tabs["collections"] == true },
+                { id = "authors",     text = _("Authors"),     checked = show_tabs["authors"]     == true },
+                { id = "series",      text = _("Series"),      checked = show_tabs["series"]      == true },
+                { id = "to_be_read",  text = _("To Be Read"),  checked = show_tabs["to_be_read"]  == true },
+                { id = "search",      text = _("Search"),      checked = show_tabs["search"]      == true },
+                { id = "stats",       text = _("Stats"),       checked = show_tabs["stats"]       == true },
+            },
+            on_apply = function(sel)
+                if type(config.navbar) ~= "table" then config.navbar = {} end
+                if type(config.navbar.show_tabs) ~= "table" then config.navbar.show_tabs = {} end
+                local tabs = { "continue", "history", "favorites", "collections",
+                               "authors", "series", "to_be_read", "search", "stats" }
+                for _, id in ipairs(tabs) do
+                    config.navbar.show_tabs[id] = sel[id] == true
+                end
+                save_and_apply("navbar")
+            end,
+        },
+
+        {
+            title       = _("Quick Settings"),
+            image       = img("onboarding/quicksettings.png"),
+            description = _("Swipe down to reach quick settings like brightness, Wi-Fi, night mode, neo mode and more."),
+        },
+
+        {
+            title       = _("Neo Mode"),
+            image       = img("onboarding/neo_mode.png"),
+            description = _("Turn on Neo mode to strip KOReader down to its bare essentials.\n\nRemove visual clutter for a focused, distraction-free reading experience. Exit at anytime from Settings."),
+        },
+
+        {
+            title       = _("Status Bar"),
+            image       = img("onboarding/status_bar.png"),
+            description = _("Minimal status bar in the library view.\nCustomizable - show only what you need: time, battery, etc."),
+        },
+
+        {
+            title       = _("Sleep Screen"),
+            description = _("What should your device show when it goes to sleep?"),
+            choice_type = "radio",
+            choices     = {
+                { id = "keep",          text = _("Keep existing settings"),         checked = true  },
+                { id = "cover_black",   text = _("Book cover - black background"), checked = false },
+                { id = "neo_white",     text = _("Neo icon - white background"),   checked = false },
+                { id = "neo_black",     text = _("Neo icon - black background"),   checked = false },
+            },
+            on_apply = function(sel)
+                if sel["keep"] then return end
+                local preset
+                if     sel["cover_black"] then preset = builtin_presets[1]
+                elseif sel["neo_white"]   then preset = builtin_presets[2]
+                elseif sel["neo_black"]   then preset = builtin_presets[4]
+                end
+                if preset then
+                    apply_screensaver_preset(preset)
+                    if type(config.sleep_screen) ~= "table" then
+                        config.sleep_screen = { presets = {}, active_preset = nil }
+                    end
+                    config.sleep_screen.active_preset = preset.name
+                    plugin:saveConfig()
+                end
+            end,
+        },
+
+        {
+            title       = _("Time Format"),
+            description = _("Which time format do you prefer?"),
+            choice_type = "radio",
+            choices     = {
+                { id = "12h", text = _("12-hour  (3:30 PM)"), checked = is_12h      },
+                { id = "24h", text = _("24-hour  (15:30)"),   checked = not is_12h  },
+            },
+            on_apply = function(sel)
+                if sel["12h"] then
+                    G_reader_settings:makeTrue("twelve_hour_clock")
+                elseif sel["24h"] then
+                    G_reader_settings:makeFalse("twelve_hour_clock")
+                end
+                local ok_fm, FileManager = pcall(require, "apps/filemanager/filemanager")
+                local fm = ok_fm and FileManager and FileManager.instance
+                if fm and type(fm._updateStatusBar) == "function" then
+                    fm:_updateStatusBar()
+                end
+            end,
+        },
+
+        {
+            title       = _("Reader"),
+            image       = img("onboarding/reader.png"),
+            description = _("An unobtrusive reader view with customizable top clock and bottom progress bar."),
+            choice_type = "radio",
+            choices     = {
+                { id = "keep", text = _("Keep existing settings"), checked = true  },
+                { id = "neo",  text = _("Neo UI defaults"), checked = false },
+            },
+            on_apply = function(sel)
+                if sel["keep"] then return end
+                G_reader_settings:saveSetting("copt_h_page_margins", {30, 30})
+                G_reader_settings:saveSetting("copt_sync_t_b_page_margins", 1)
+                G_reader_settings:saveSetting("copt_t_page_margin", 30)
+                G_reader_settings:saveSetting("copt_b_page_margin", 30)
+                G_reader_settings:saveSetting("copt_word_spacing", {100, 90})
+                G_reader_settings:saveSetting("copt_line_spacing", 110)
+                G_reader_settings:saveSetting("copt_font_gamma", 25)  -- gamma index for 1.45
+                G_reader_settings:saveSetting("copt_font_size", 23)
+                G_reader_settings:saveSetting("copt_embedded_css", 0)
+                G_reader_settings:saveSetting("copt_embedded_fonts", 0)
+                G_reader_settings:saveSetting("copt_nightmode_images", 1)
+                G_reader_settings:saveSetting("alt_status_bar", false)
+            end,
+        },
+
+        {
+            title       = _("Reader Progress"),
+            description = _("Choose a preset for your reading progress bar."),
+            choice_type = "radio",
+            choices     = {
+                { id = "keep",     text = _("Keep existing settings"),                                                       checked = true  },
+                { id = "kindle",   text = _("Chapter Time + %"),      image = img("onboarding/kindle_like.png"),        checked = false },
+                { id = "pages",    text = _("Pages and %"),      image = img("onboarding/pages_percent.png"),      checked = false },
+                { id = "full",     text = _("Pages + Chapter Time + %"), image = img("onboarding/pages_time_percent.png"), checked = false },
+                { id = "centered", text = _("Centered Pages"),   image = img("onboarding/centered_pages.png"),     checked = false },
+            },
+            on_apply = function(sel)
+                if sel["keep"] then return end
+                if not footer_presets then return end
+                local preset
+                if     sel["kindle"]   then preset = footer_presets[1]
+                elseif sel["pages"]    then preset = footer_presets[2]
+                elseif sel["full"]     then preset = footer_presets[3]
+                elseif sel["centered"] then preset = footer_presets[4]
+                end
+                if preset then apply_footer_preset(preset) end
+            end,
+        },
+
+        {
+            title       = _("Page Browser"),
+            image       = img("onboarding/page_browser.png"),
+            description = _("Swipe up from the bottom while reading to open the Page Browser.\n\nSkim through pages or skip chapters, browse the table of contents, manage bookmarks, adjust fonts and more."),
+        },
+
+        {
+            title       = _("Settings & Updates"),
+            image       = img("onboarding/neo_ui_settings.png"),
+            description = _("All settings in one unified tab.\nCheck for and install Neo UI updates directly from your e-reader."),
+        },
+
+        {
+            title       = _("You're All Set"),
+            icon        = "neo_ui",
+            finale      = true,
+            description = _("The best interface is the one you forget is there.\nNow go get lost in a good book."),
+        },
+    }
+
+    do
+        local current_home = paths.getHomeDir()
+        if not current_home or current_home == "" then
+            local base_storage = "/"
+            pcall(function()
+                local Dev = require("device")
+                if     Dev.isKobo       and Dev:isKobo()       then base_storage = "/mnt/onboard"
+                elseif Dev.isKindle     and Dev:isKindle()     then base_storage = "/mnt/base-us"
+                elseif Dev.isPocketBook and Dev:isPocketBook() then base_storage = "/mnt/ext1"
+                elseif Dev.isAndroid    and Dev:isAndroid()    then base_storage = "/sdcard"
+                end
+            end)
+            local books_dir = base_storage .. "/books"
+            table.insert(pages, #pages, {
+                title       = _("Home Folder"),
+                description = T(_("The place for all your books %1"), books_dir),
+                choice_type = "radio",
+                choices     = {
+                    { id = "books",  text = _("Create this folder and use as home"), checked = true  },
+                    { id = "choose", text = _("Choose a different folder"),           checked = false },
+                    { id = "skip",   text = _("Skip"),                                checked = false },
+                },
+                on_apply = function(sel)
+                    if sel["skip"] then return end
+                    local function apply_sort_defaults()
+                        G_reader_settings:saveSetting("collate", "access")
+                        G_reader_settings:saveSetting("collate_mixed", true)
+                    end
+                    if sel["books"] then
+                        local ok_lfs, lfs = pcall(require, "libs/libkoreader-lfs")
+                        if not ok_lfs then return end
+                        if lfs.attributes(books_dir, "mode") ~= "directory" then
+                            lfs.mkdir(books_dir)
+                        end
+                        if lfs.attributes(books_dir, "mode") == "directory" then
+                            G_reader_settings:saveSetting("home_dir", books_dir)
+                            apply_sort_defaults()
+                        end
+                    elseif sel["choose"] then
+                        local ok_ui, UIMan = pcall(require, "ui/uimanager")
+                        if not ok_ui then return end
+                        UIMan:scheduleIn(0.3, function()
+                            local ok_pc, PathChooser = pcall(require, "ui/widget/pathchooser")
+                            if not ok_pc then return end
+                            UIMan:show(PathChooser:new{
+                                select_directory = true,
+                                path             = base_storage,
+                                onConfirm        = function(chosen_path)
+                                    if chosen_path and chosen_path ~= "" then
+                                        G_reader_settings:saveSetting("home_dir", chosen_path)
+                                        apply_sort_defaults()
+                                    end
+                                end,
+                            })
+                        end)
+                    end
+                end,
+            })
+        end
+    end
+
+    local ok_inject, err_inject = pcall(function()
+        local covers  = loadQuickstartCovers(3)
+        local Device  = require("device")
+        local scr_w   = Device.screen:getWidth()
+        local scr_h   = Device.screen:getHeight()
+        local avail_w = scr_w - Device.screen:scaleBySize(80)
+        local qs_pad  = Device.screen:scaleBySize(20)
+        local img_h   = scr_h - Device.screen:scaleBySize(60) - 1 - math.floor(scr_h * 0.40)
+        local slot_w  = scr_w - qs_pad * 2
+        local slot_h  = img_h - Device.screen:scaleBySize(8)
+        local mosaic_bb       = #covers > 0 and buildMosaicBB(covers, avail_w) or nil
+        local list_bb         = #covers > 0 and buildListBB(covers, avail_w) or nil
+        local browser_bb      = #covers > 0 and buildMosaicBB(covers, avail_w) or nil
+        local context_menu_bb = buildContextMenuBB(slot_w, slot_h, covers[1])
+        local neo_bb          = buildNeoButtonBB(avail_w)
+        local home_bb         = buildHomeIconBB(avail_w)
+        for _, c in ipairs(covers) do c.bb:free() end
+        for _i, page in ipairs(pages) do
+            if page.title == _("File Browser") and browser_bb then
+                page.image_bb, page.image = browser_bb, nil
+            elseif page.title == _("Context Menu") and context_menu_bb then
+                page.image_bb, page.image = context_menu_bb, nil
+            elseif page.title == _("Neo Mode") and neo_bb then
+                page.image_bb, page.image = neo_bb, nil
+            elseif page.title == _("Home Folder") and home_bb then
+                page.image_bb, page.image = home_bb, nil
+            end
+            if page.choices then
+                for _j, choice in ipairs(page.choices) do
+                    if choice.id == "mosaic" and mosaic_bb then
+                        choice.image_bb, choice.image = mosaic_bb, nil
+                    elseif choice.id == "list" and list_bb then
+                        choice.image_bb, choice.image = list_bb, nil
+                    end
+                end
+            end
+        end
+    end)
+    if not ok_inject then
+        local logger = require("logger")
+        logger.warn("NeoUI quickstart: cover injection failed:", err_inject)
+    end
+
+    return pages
+end
+
+
+M.UPDATE_PAGES = {
+}
+
+local ok_cl, changelog = pcall(require, "config/changelog")
+M.CHANGELOGS = ok_cl and type(changelog) == "table" and changelog or {}
+
+return M
