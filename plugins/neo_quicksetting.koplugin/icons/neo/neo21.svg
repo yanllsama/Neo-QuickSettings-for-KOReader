@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  <!-- Left half is tablet -->
+  <path d="M 20 20 L 50 20 L 50 80 L 20 80 Z" fill="#2D3748" />
+  <path d="M 25 25 L 45 25 L 45 75 L 25 75 Z" fill="#EDF2F7" />
+  <!-- Right half is book pages -->
+  <path d="M 50 20 Q 75 10 90 20 L 90 80 Q 75 70 50 80 Z" fill="#81E6D9" />
+  <path d="M 50 25 Q 70 15 85 25 L 85 75 Q 70 65 50 75 Z" fill="#4FD1C5" />
+  
+    <polyline points="26.0,46.5 26.0,40.0 30.5,46.5 30.5,40.0" stroke="#319795" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <polyline points="35.0,40.0 32.0,40.0 32.0,46.5 35.0,46.5" stroke="#319795" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <line x1='32.0' y1='43.25' x2='34.5' y2='43.25' stroke="#319795" stroke-width="2" stroke-linecap="round" />
+    <circle cx="40.0" cy="43.25" r="3.25" stroke="#319795" stroke-width="2" fill="none" />
+    
+
+</svg>

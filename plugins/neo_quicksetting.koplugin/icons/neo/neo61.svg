@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+    <line x1="25" y1="15" x2="25" y2="70" stroke="#2D3748" stroke-width="6" stroke-linecap="round" />
+    <line x1="50" y1="15" x2="50" y2="70" stroke="#2D3748" stroke-width="6" stroke-linecap="round" />
+    <line x1="75" y1="15" x2="75" y2="70" stroke="#2D3748" stroke-width="6" stroke-linecap="round" />
+    
+    <line x1="25" y1="55" x2="25" y2="70" stroke="#4FD1C5" stroke-width="6" stroke-linecap="round" />
+    <line x1="50" y1="40" x2="50" y2="70" stroke="#4FD1C5" stroke-width="6" stroke-linecap="round" />
+    <line x1="75" y1="25" x2="75" y2="70" stroke="#4FD1C5" stroke-width="6" stroke-linecap="round" />
+    
+        <rect x="15" y="50" width="20" height="10" rx="3" fill="#319795" />
+        <rect x="40" y="35" width="20" height="10" rx="3" fill="#319795" />
+        <rect x="65" y="20" width="20" height="10" rx="3" fill="#319795" />
+        
+    <!-- N -->
+    <polyline points="28,95 28,80 40,95 40,80" stroke="#38A169" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <!-- E -->
+    <polyline points="53,80 45,80 45,95 53,95" stroke="#38A169" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <line x1="45" y1="87.5" x2="51" y2="87.5" stroke="#38A169" stroke-width="4" stroke-linecap="round" />
+    <!-- O -->
+    <circle cx="65.5" cy="87.5" r="7.5" stroke="#38A169" stroke-width="4" fill="none" />
+    
+</svg>

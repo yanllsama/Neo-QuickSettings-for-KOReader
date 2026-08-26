@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  <!-- Switch background -->
+  <rect x="15" y="30" width="70" height="40" rx="20" fill="#2D3748" />
+  <!-- Active side -->
+  <rect x="15" y="30" width="40" height="40" rx="20" fill="#4FD1C5" />
+  <!-- Switch knob -->
+  <circle cx="55" cy="50" r="16" fill="#EDF2F7" />
+  <circle cx="55" cy="50" r="10" fill="#319795" />
+  <!-- Small NEO text below -->
+  <path d="M 40 85 L 40 75 L 45 85 L 45 75 M 50 75 L 55 75 L 50 85 L 55 85 M 60 80 A 5 5 0 1 1 60 79.9" fill="none" stroke="#2D3748" stroke-width="2" />
+
+</svg>

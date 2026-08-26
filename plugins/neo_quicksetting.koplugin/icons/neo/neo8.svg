@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  <rect x="0" y="0" width="100" height="100" fill="#1A202C" />
+  <!-- Crescent Moon -->
+  <path d="M 70 15 Q 55 25 65 45 Q 85 45 90 35 Q 80 35 75 25 Q 75 20 70 15 Z" fill="#ECC94B" />
+  <!-- Stars -->
+  <circle cx="25" cy="25" r="3" fill="#EDF2F7" />
+  <circle cx="45" cy="15" r="2" fill="#EDF2F7" />
+  <circle cx="85" cy="65" r="2" fill="#EDF2F7" />
+  <!-- Book at bottom -->
+  <path d="M 50 90 Q 25 80 5 90 L 5 60 Q 25 50 50 60 Q 75 50 95 60 L 95 90 Q 75 80 50 90 Z" fill="#4FD1C5" />
+  <line x1="50" y1="60" x2="50" y2="90" stroke="#2D3748" stroke-width="4" />
+
+</svg>

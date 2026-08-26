@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+<rect x="0" y="0" width="100" height="100" rx="10" fill="#1A202C" />
+
+    <line x1="25" y1="15" x2="25" y2="70" stroke="#4A5568" stroke-width="6" stroke-linecap="round" />
+    <line x1="50" y1="15" x2="50" y2="70" stroke="#4A5568" stroke-width="6" stroke-linecap="round" />
+    <line x1="75" y1="15" x2="75" y2="70" stroke="#4A5568" stroke-width="6" stroke-linecap="round" />
+    
+    <line x1="25" y1="30" x2="25" y2="70" stroke="#48BB78" stroke-width="6" stroke-linecap="round" />
+    <line x1="50" y1="20" x2="50" y2="70" stroke="#48BB78" stroke-width="6" stroke-linecap="round" />
+    <line x1="75" y1="50" x2="75" y2="70" stroke="#48BB78" stroke-width="6" stroke-linecap="round" />
+    
+        <rect x="15" y="25" width="20" height="10" rx="3" fill="#EDF2F7" />
+        <rect x="40" y="15" width="20" height="10" rx="3" fill="#EDF2F7" />
+        <rect x="65" y="45" width="20" height="10" rx="3" fill="#EDF2F7" />
+        
+    <!-- N -->
+    <polyline points="28,95 28,80 40,95 40,80" stroke="#48BB78" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <!-- E -->
+    <polyline points="53,80 45,80 45,95 53,95" stroke="#48BB78" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <line x1="45" y1="87.5" x2="51" y2="87.5" stroke="#48BB78" stroke-width="4" stroke-linecap="round" />
+    <!-- O -->
+    <circle cx="65.5" cy="87.5" r="7.5" stroke="#48BB78" stroke-width="4" fill="none" />
+    
+</svg>

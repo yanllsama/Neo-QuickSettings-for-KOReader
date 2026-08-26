@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  
+  <!-- E-Reader Tablet (Background) -->
+  <rect x="25" y="10" width="50" height="80" rx="4" ry="4" fill="#2D3748" />
+  
+  <!-- E-Reader Screen -->
+  <rect x="30" y="15" width="40" height="65" rx="2" ry="2" fill="#EDF2F7" />
+
+  <!-- E-Reader Home Button -->
+  <rect x="45" y="84" width="10" height="2" rx="1" ry="1" fill="#EDF2F7" />
+
+  <!-- "NEO" Text inside the screen (Top Half) -->
+  <!-- N -->
+  <polyline points="33,35 33,22 42,35 42,22" stroke="#2D3748" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+  <!-- E -->
+  <polyline points="51,22 45,22 45,35 51,35" stroke="#2D3748" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+  <line x1="45" y1="28.5" x2="50" y2="28.5" stroke="#2D3748" stroke-width="3" stroke-linecap="round" />
+  <!-- O -->
+  <circle cx="61" cy="28.5" r="6.5" stroke="#2D3748" stroke-width="3" fill="none" />
+
+  <!-- Bursting Book Left Pages (Pops out of the screen) -->
+  <path d="M 50 85 Q 25 75 10 85 L 10 55 Q 25 45 50 55 Z" fill="#E6FFFA" stroke="#319795" stroke-width="1" />
+  <path d="M 50 80 Q 25 70 10 80 L 10 50 Q 25 40 50 50 Z" fill="#B2F5EA" />
+  <path d="M 50 75 Q 25 65 10 75 L 10 45 Q 25 35 50 45 Z" fill="#319795" />
+
+  <!-- Bursting Book Right Pages (Pops out of the screen) -->
+  <path d="M 50 85 Q 75 75 90 85 L 90 55 Q 75 45 50 55 Z" fill="#E6FFFA" stroke="#319795" stroke-width="1" />
+  <path d="M 50 80 Q 75 70 90 80 L 90 50 Q 75 40 50 50 Z" fill="#81E6D9" />
+  <path d="M 50 75 Q 75 65 90 75 L 90 45 Q 75 35 50 45 Z" fill="#4FD1C5" />
+
+  <!-- Book Spine -->
+  <line x1="50" y1="45" x2="50" y2="85" stroke="#234E52" stroke-width="2" stroke-linecap="round" />
+
+  <!-- Red Ribbon Bookmark -->
+  <polygon points="65,39 65,65 70,70 75,65 75,37" fill="#E53E3E" />
+
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  <rect x="15" y="15" width="30" height="30" rx="6" fill="#4FD1C5" />
+  <rect x="55" y="15" width="30" height="30" rx="6" fill="#2D3748" />
+  <rect x="15" y="55" width="30" height="30" rx="6" fill="#2D3748" />
+  <rect x="55" y="55" width="30" height="30" rx="6" fill="#319795" />
+  <!-- Mini icons -->
+  <circle cx="30" cy="30" r="6" fill="#EDF2F7" />
+  <line x1="60" y1="20" x2="80" y2="40" stroke="#EDF2F7" stroke-width="4" />
+  <line x1="80" y1="20" x2="60" y2="40" stroke="#EDF2F7" stroke-width="4" />
+  <polygon points="30,60 40,80 20,80" fill="#EDF2F7" />
+  <rect x="65" y="65" width="10" height="10" fill="#EDF2F7" />
+
+</svg>

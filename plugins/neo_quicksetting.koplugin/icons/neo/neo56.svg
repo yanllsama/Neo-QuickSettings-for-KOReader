@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  <line x1="25" y1="20" x2="25" y2="80" stroke="#2D3748" stroke-width="4" stroke-linecap="round" />
+  <line x1="50" y1="20" x2="50" y2="80" stroke="#2D3748" stroke-width="4" stroke-linecap="round" />
+  <line x1="75" y1="20" x2="75" y2="80" stroke="#2D3748" stroke-width="4" stroke-linecap="round" />
+  
+  <!-- Circle -->
+  <circle cx="25" cy="30" r="8" fill="#4FD1C5" />
+  <!-- Square -->
+  <rect x="42" y="60" width="16" height="16" fill="#81E6D9" />
+  <!-- Triangle -->
+  <polygon points="75,35 67,48 83,48" fill="#319795" />
+
+</svg>
