@@ -1,0 +1,398 @@
+
+local logger = require("logger")
+local SQ3 = require("lua-ljsqlite3/init")
+local lfs = require("libs/libkoreader-lfs")
+local paths = require("common/paths")
+
+local M = {}
+
+local function getDbPath()
+    local ok, DataStorage = pcall(require, "datastorage")
+    if not ok then return nil end
+    local path = DataStorage:getSettingsDir() .. "/bookinfo_cache.sqlite3"
+    if lfs.attributes(path, "mode") == "file" then return path end
+    return nil
+end
+
+local function splitAuthors(authors_str)
+    if not authors_str or authors_str == "" then return {} end
+    local trimmed = authors_str:match("^%s*(.-)%s*$")
+    if trimmed == "" then return {} end
+    return { trimmed }
+end
+
+function M.getGroupedByAuthor()
+    local db_path = getDbPath()
+    if not db_path then
+        logger.warn("neo-ui db_bookinfo: bookinfo_cache.sqlite3 not found")
+        return {}
+    end
+
+    local home_dir = paths.getHomeDir()
+    local ok, conn = pcall(SQ3.open, db_path)
+    if not ok then
+        logger.warn("neo-ui db_bookinfo: failed to open DB:", conn)
+        return {}
+    end
+    conn:set_busy_timeout(3000)
+
+    local author_map = {}  -- author -> { files }
+
+    local ok2, err = pcall(function()
+        local sql = [[
+            SELECT directory, filename, authors
+            FROM bookinfo
+            WHERE in_progress = 0
+              AND authors IS NOT NULL
+              AND authors != ''
+            ORDER BY authors
+        ]]
+        local res = conn:exec(sql)
+        if not res then return end
+
+        local dirs      = res[1] or {}
+        local filenames = res[2] or {}
+        local authors_col = res[3] or {}
+        logger.info("neo-ui db_bookinfo: getGroupedByAuthor rows from SQL:", #dirs)
+
+        for i = 1, #dirs do
+            local dir    = dirs[i]
+            local fname  = filenames[i]
+            local authors_str = authors_col[i]
+
+            if not dir or not fname or not authors_str then goto continue end
+
+            local raw_filepath  = dir .. fname
+            local norm_filepath = paths.normPath(raw_filepath)
+
+            if home_dir and not paths.isInHomeDir(norm_filepath) then
+                goto continue
+            end
+
+            if lfs.attributes(norm_filepath, "mode") ~= "file" then
+                goto continue
+            end
+
+            local author_list = splitAuthors(authors_str)
+            for _, author in ipairs(author_list) do
+                if not author_map[author] then
+                    author_map[author] = {}
+                end
+                table.insert(author_map[author], raw_filepath)
+            end
+
+            ::continue::
+        end
+    end)
+
+    conn:close()
+
+    if not ok2 then
+        logger.warn("neo-ui db_bookinfo: query error:", err)
+        return {}
+    end
+
+    local groups = {}
+    for author, files in pairs(author_map) do
+        table.insert(groups, { author = author, files = files })
+    end
+    table.sort(groups, function(a, b)
+        return a.author < b.author
+    end)
+
+    logger.dbg("neo-ui db_bookinfo: getGroupedByAuthor result:", #groups, "authors")
+    return groups
+end
+
+function M.getGroupedBySeries()
+    local db_path = getDbPath()
+    if not db_path then
+        logger.warn("neo-ui db_bookinfo: bookinfo_cache.sqlite3 not found")
+        return {}
+    end
+
+    local home_dir = paths.getHomeDir()
+    local ok, conn = pcall(SQ3.open, db_path)
+    if not ok then
+        logger.warn("neo-ui db_bookinfo: failed to open DB:", conn)
+        return {}
+    end
+    conn:set_busy_timeout(3000)
+
+    local series_map = {}  -- series_name -> { {file, series_index, filename} }
+
+    local ok2, err = pcall(function()
+        local sql = [[
+            SELECT directory, filename, series, series_index
+            FROM bookinfo
+            WHERE in_progress = 0
+              AND series IS NOT NULL
+              AND series != ''
+            ORDER BY series, series_index
+        ]]
+        local res = conn:exec(sql)
+        if not res then return end
+
+        local dirs         = res[1] or {}
+        local filenames    = res[2] or {}
+        local series_col   = res[3] or {}
+        local idx_col      = res[4] or {}
+        logger.dbg("neo-ui db_bookinfo: getGroupedBySeries rows from SQL:", #dirs)
+
+        for i = 1, #dirs do
+            local dir    = dirs[i]
+            local fname  = filenames[i]
+            local series = series_col[i]
+            local sidx   = tonumber(idx_col[i])
+
+            if not dir or not fname or not series then goto continue end
+
+            local raw_filepath  = dir .. fname
+            local norm_filepath = paths.normPath(raw_filepath)
+
+            if home_dir and not paths.isInHomeDir(norm_filepath) then
+                goto continue
+            end
+
+            if lfs.attributes(norm_filepath, "mode") ~= "file" then
+                goto continue
+            end
+
+            if not series_map[series] then
+                series_map[series] = {}
+            end
+            table.insert(series_map[series], {
+                file         = raw_filepath,
+                series_index = sidx,
+                filename     = fname,
+            })
+
+            ::continue::
+        end
+    end)
+
+    conn:close()
+
+    if not ok2 then
+        logger.warn("neo-ui db_bookinfo: query error:", err)
+        return {}
+    end
+
+    local groups = {}
+    for series, items in pairs(series_map) do
+        table.sort(items, function(a, b)
+            local ia = a.series_index or 0
+            local ib = b.series_index or 0
+            if ia ~= ib then return ia < ib end
+            return (a.filename or "") < (b.filename or "")
+        end)
+        table.insert(groups, { series = series, items = items })
+    end
+    table.sort(groups, function(a, b)
+        return a.series < b.series
+    end)
+
+    logger.dbg("neo-ui db_bookinfo: getGroupedBySeries result:", #groups, "series")
+    return groups
+end
+
+function M.getTBRBooks()
+    local db_path = getDbPath()
+    if not db_path then
+        logger.warn("neo-ui db_bookinfo: getTBRBooks: bookinfo_cache.sqlite3 not found")
+        return {}
+    end
+
+    local home_dir = paths.getHomeDir()
+    local ok, conn = pcall(SQ3.open, db_path)
+    if not ok then
+        logger.warn("neo-ui db_bookinfo: getTBRBooks: failed to open DB:", conn)
+        return {}
+    end
+    conn:set_busy_timeout(3000)
+
+    local candidates = {}
+
+    local ok2, err = pcall(function()
+        local sql = [[
+            SELECT directory, filename
+            FROM bookinfo
+            ORDER BY filename
+        ]]
+        local res = conn:exec(sql)
+        if not res then return end
+
+        local dirs      = res[1] or {}
+        local filenames = res[2] or {}
+
+        for i = 1, #dirs do
+            local dir   = dirs[i]
+            local fname = filenames[i]
+            if not dir or not fname then goto continue end
+            local raw_filepath  = dir .. fname
+            local norm_filepath = paths.normPath(raw_filepath)
+            if home_dir and not paths.isInHomeDir(norm_filepath) then
+                goto continue
+            end
+            if lfs.attributes(norm_filepath, "mode") ~= "file" then
+                goto continue
+            end
+            table.insert(candidates, raw_filepath)
+            ::continue::
+        end
+    end)
+
+    conn:close()
+
+    if not ok2 then
+        logger.warn("neo-ui db_bookinfo: getTBRBooks query error:", err)
+        return {}
+    end
+
+    local ok_ds, DocSettings = pcall(require, "docsettings")
+    if not ok_ds then return {} end
+
+    local result = {}
+    for _, filepath in ipairs(candidates) do
+        if DocSettings:hasSidecarFile(filepath) then
+            local ok3, doc = pcall(DocSettings.open, DocSettings, filepath)
+            if ok3 and doc then
+                local summary = doc:readSetting("summary")
+                if summary and summary.status == "abandoned" then
+                    table.insert(result, filepath)
+                end
+            end
+        end
+    end
+
+    logger.dbg("neo-ui db_bookinfo: getTBRBooks result:", #result, "books")
+    return result
+end
+
+function M.getGroupedByTags()
+    local db_path = getDbPath()
+    if not db_path then
+        logger.warn("neo-ui db_bookinfo: getGroupedByTags: bookinfo_cache.sqlite3 not found")
+        return {}
+    end
+
+    local home_dir = paths.getHomeDir()
+    local ok, conn = pcall(SQ3.open, db_path)
+    if not ok then
+        logger.warn("neo-ui db_bookinfo: getGroupedByTags: failed to open DB:", conn)
+        return {}
+    end
+    conn:set_busy_timeout(3000)
+
+    local tag_map = {}  -- tag_name -> { file_paths }
+
+    local ok2, err = pcall(function()
+        local sql = [[
+            SELECT directory, filename, keywords
+            FROM bookinfo
+            WHERE keywords IS NOT NULL
+              AND keywords != ''
+            ORDER BY filename
+        ]]
+        local res = conn:exec(sql)
+        if not res then return end
+
+        local dirs      = res[1] or {}
+        local filenames = res[2] or {}
+        local kw_col    = res[3] or {}
+
+        for i = 1, #dirs do
+            local dir   = dirs[i]
+            local fname = filenames[i]
+            local kw    = kw_col[i]
+            if not dir or not fname or not kw then goto continue end
+
+            local raw_filepath  = dir .. fname
+            local norm_filepath = paths.normPath(raw_filepath)
+
+            if home_dir and not paths.isInHomeDir(norm_filepath) then
+                goto continue
+            end
+            if lfs.attributes(norm_filepath, "mode") ~= "file" then
+                goto continue
+            end
+
+            local normalized = kw:gsub(",", "\n")
+            for tag in normalized:gmatch("[^\n]+") do
+                local trimmed = tag:match("^%s*(.-)%s*$")
+                if trimmed and trimmed ~= "" then
+                    if not tag_map[trimmed] then
+                        tag_map[trimmed] = {}
+                    end
+                    table.insert(tag_map[trimmed], raw_filepath)
+                end
+            end
+
+            ::continue::
+        end
+    end)
+
+    conn:close()
+
+    if not ok2 then
+        logger.warn("neo-ui db_bookinfo: getGroupedByTags query error:", err)
+        return {}
+    end
+
+    local groups = {}
+    for tag, files in pairs(tag_map) do
+        table.insert(groups, { tag = tag, files = files })
+    end
+    table.sort(groups, function(a, b)
+        return a.tag < b.tag
+    end)
+
+    logger.dbg("neo-ui db_bookinfo: getGroupedByTags result:", #groups, "tags")
+    return groups
+end
+
+function M.getTotalBookCount()
+    local db_path = getDbPath()
+    if not db_path then return 0 end
+
+    local home_dir = paths.getHomeDir()
+    local ok, conn = pcall(SQ3.open, db_path)
+    if not ok then return 0 end
+    conn:set_busy_timeout(3000)
+
+    local count = 0
+    local ok2, err = pcall(function()
+        local sql, row
+        if home_dir then
+            local alt
+            if home_dir:match("^/storage/emulated/0") then
+                alt = home_dir:gsub("^/storage/emulated/0", "/sdcard")
+            elseif home_dir:match("^/sdcard") then
+                alt = home_dir:gsub("^/sdcard", "/storage/emulated/0")
+            end
+            if alt and alt ~= home_dir then
+                sql = string.format(
+                    "SELECT COUNT(*) FROM bookinfo WHERE in_progress = 0"
+                    .. " AND (directory LIKE %q OR directory LIKE %q);",
+                    home_dir .. "%", alt .. "%")
+            else
+                sql = string.format(
+                    "SELECT COUNT(*) FROM bookinfo WHERE in_progress = 0"
+                    .. " AND directory LIKE %q;",
+                    home_dir .. "%")
+            end
+        else
+            sql = "SELECT COUNT(*) FROM bookinfo WHERE in_progress = 0;"
+        end
+        row = conn:rowexec(sql)
+        count = tonumber(row) or 0
+    end)
+    conn:close()
+    if not ok2 then
+        logger.warn("neo-ui db_bookinfo: getTotalBookCount error:", err)
+    end
+    logger.info("neo-ui db_bookinfo: total_book_count=", count)
+    return count
+end
+
+return M

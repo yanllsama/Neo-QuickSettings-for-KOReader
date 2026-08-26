@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  <!-- A large hexagon acting as a gear -->
+  <polygon points="50,5 89,27 89,73 50,95 11,73 11,27" fill="#2D3748" />
+  <circle cx="50" cy="50" r="35" fill="#EDF2F7" />
+  <circle cx="50" cy="50" r="28" fill="#4FD1C5" />
+  <path d="M 50 65 Q 35 55 25 65 L 25 35 Q 35 25 50 35 Q 65 25 75 35 L 75 65 Q 65 55 50 65 Z" fill="#2D3748" />
+
+</svg>

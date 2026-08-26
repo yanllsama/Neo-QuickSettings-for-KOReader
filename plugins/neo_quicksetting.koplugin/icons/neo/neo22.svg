@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  <!-- Giant Book Cape -->
+  <path d="M 50 40 Q 20 10 5 30 L 5 80 Q 20 60 50 90 Q 80 60 95 80 L 95 30 Q 80 10 50 40 Z" fill="#4FD1C5" />
+  <path d="M 50 45 Q 25 20 10 35 L 10 75 Q 25 60 50 85 Q 75 60 90 75 L 90 35 Q 75 20 50 45 Z" fill="#81E6D9" />
+  <!-- Tablet center -->
+  
+    <rect x="30" y="20" width="40" height="60" rx="4" fill="#2D3748" />
+    <rect x="35" y="25" width="30" height="45" rx="2" fill="#EDF2F7" />
+    <rect x="45.0" y="74" width="10" height="2" rx="1" fill="#EDF2F7" />
+    
+  <!-- Small book inside screen -->
+  <path d="M 50 55 Q 40 50 35 55 L 35 45 Q 40 40 50 45 Q 60 40 65 45 L 65 55 Q 60 50 50 55 Z" fill="#2D3748" />
+  <!-- NEO text -->
+  
+    <polyline points="32.0,41.0 32.0,28.0 41.0,41.0 41.0,28.0" stroke="#2D3748" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <polyline points="50.0,28.0 44.0,28.0 44.0,41.0 50.0,41.0" stroke="#2D3748" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <line x1='44.0' y1='34.5' x2='49.0' y2='34.5' stroke="#2D3748" stroke-width="3" stroke-linecap="round" />
+    <circle cx="60.0" cy="34.5" r="6.5" stroke="#2D3748" stroke-width="3" fill="none" />
+    
+
+</svg>

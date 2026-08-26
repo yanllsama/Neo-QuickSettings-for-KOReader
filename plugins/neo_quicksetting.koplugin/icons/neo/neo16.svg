@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  
+    <rect x="10" y="10" width="80" height="80" rx="4" fill="#2D3748" />
+    <rect x="15" y="15" width="70" height="65" rx="2" fill="#1A202C" />
+    <rect x="45.0" y="84" width="10" height="2" rx="1" fill="#1A202C" />
+    
+  <!-- Starry Sky -->
+  <circle cx="30" cy="30" r="2" fill="#E6FFFA" />
+  <circle cx="70" cy="20" r="1.5" fill="#E6FFFA" />
+  <circle cx="80" cy="60" r="2.5" fill="#E6FFFA" />
+  <path d="M 50 65 Q 30 50 20 65 L 20 40 Q 30 25 50 40 Q 70 25 80 40 L 80 65 Q 70 50 50 65 Z" fill="#ECC94B" />
+  
+    <polyline points="33.0,83.0 33.0,70.0 42.0,83.0 42.0,70.0" stroke="#4FD1C5" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <polyline points="51.0,70.0 45.0,70.0 45.0,83.0 51.0,83.0" stroke="#4FD1C5" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <line x1='45.0' y1='76.5' x2='50.0' y2='76.5' stroke="#4FD1C5" stroke-width="3" stroke-linecap="round" />
+    <circle cx="61.0" cy="76.5" r="6.5" stroke="#4FD1C5" stroke-width="3" fill="none" />
+    
+
+</svg>

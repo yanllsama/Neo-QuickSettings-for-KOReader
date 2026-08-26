@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  <!-- Slider Tracks -->
+  <line x1="25" y1="20" x2="25" y2="80" stroke="#2D3748" stroke-width="6" stroke-linecap="round" />
+  <line x1="50" y1="20" x2="50" y2="80" stroke="#2D3748" stroke-width="6" stroke-linecap="round" />
+  <line x1="75" y1="20" x2="75" y2="80" stroke="#2D3748" stroke-width="6" stroke-linecap="round" />
+  <!-- Active paths -->
+  <line x1="25" y1="50" x2="25" y2="80" stroke="#4FD1C5" stroke-width="6" stroke-linecap="round" />
+  <line x1="50" y1="30" x2="50" y2="80" stroke="#4FD1C5" stroke-width="6" stroke-linecap="round" />
+  <line x1="75" y1="60" x2="75" y2="80" stroke="#4FD1C5" stroke-width="6" stroke-linecap="round" />
+  <!-- Knobs -->
+  <rect x="15" y="45" width="20" height="10" rx="3" fill="#319795" />
+  <rect x="40" y="25" width="20" height="10" rx="3" fill="#319795" />
+  <rect x="65" y="55" width="20" height="10" rx="3" fill="#319795" />
+
+</svg>

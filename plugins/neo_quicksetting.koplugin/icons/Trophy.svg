@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g fill="none">
+		<path fill="#c55d5d" d="M7.5 13v-3h1v3z" />
+		<path fill="url(#SVGmiYmbbjP)" d="M7.5 13v-3h1v3z" />
+		<path fill="#d9d9d9" d="M4 14a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v.504a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z" />
+		<path fill="url(#SVGch2E9bnF)" d="M4 14a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v.504a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z" />
+		<path fill="#d96a6a" fill-rule="evenodd" d="M2 4.5A1.5 1.5 0 0 1 3.5 3h2A1.5 1.5 0 0 1 7 4.5v1a2.5 2.5 0 0 1-5 0zM3.5 4a.5.5 0 0 0-.5.5v1a1.5 1.5 0 1 0 3 0v-1a.5.5 0 0 0-.5-.5z" clip-rule="evenodd" />
+		<path fill="url(#SVGud6Tf9wB)" fill-rule="evenodd" d="M2 4.5A1.5 1.5 0 0 1 3.5 3h2A1.5 1.5 0 0 1 7 4.5v1a2.5 2.5 0 0 1-5 0zM3.5 4a.5.5 0 0 0-.5.5v1a1.5 1.5 0 1 0 3 0v-1a.5.5 0 0 0-.5-.5z" clip-rule="evenodd" />
+		<path fill="#d96a6a" fill-rule="evenodd" d="M9 4.5A1.5 1.5 0 0 1 10.5 3h2A1.5 1.5 0 0 1 14 4.5v1a2.5 2.5 0 0 1-5 0zm1.5-.5a.5.5 0 0 0-.5.5v1a1.5 1.5 0 0 0 3 0v-1a.5.5 0 0 0-.5-.5z" clip-rule="evenodd" />
+		<path fill="url(#SVGAzcRycLk)" fill-rule="evenodd" d="M9 4.5A1.5 1.5 0 0 1 10.5 3h2A1.5 1.5 0 0 1 14 4.5v1a2.5 2.5 0 0 1-5 0zm1.5-.5a.5.5 0 0 0-.5.5v1a1.5 1.5 0 0 0 3 0v-1a.5.5 0 0 0-.5-.5z" clip-rule="evenodd" />
+		<path fill="#000" d="M6 1a2 2 0 0 0-2 2v4a4 4 0 1 0 8 0V3a2 2 0 0 0-2-2z" />
+		<path fill="url(#SVGR9ICJe7V)" d="M6 1a2 2 0 0 0-2 2v4a4 4 0 1 0 8 0V3a2 2 0 0 0-2-2z" />
+		<defs>
+			<linearGradient id="SVGmiYmbbjP" x1="7" x2="11.999" y1="9.4" y2="15.128" gradientUnits="userSpaceOnUse">
+				<stop offset=".174" stop-color="#eb4824" />
+				<stop offset=".563" stop-color="#ff921f" stop-opacity=".988" />
+				<stop offset=".853" stop-color="#eb4824" />
+			</linearGradient>
+			<linearGradient id="SVGch2E9bnF" x1="26.667" x2="22.119" y1="24.014" y2="7.31" gradientUnits="userSpaceOnUse">
+				<stop offset=".184" stop-color="#ffcd0f" />
+				<stop offset="1" stop-color="#ff6f47" />
+			</linearGradient>
+			<linearGradient id="SVGud6Tf9wB" x1="5.75" x2=".75" y1="5.083" y2="5.083" gradientUnits="userSpaceOnUse">
+				<stop stop-color="#eb4824" />
+				<stop offset="1" stop-color="#ffcd0f" stop-opacity=".988" />
+			</linearGradient>
+			<linearGradient id="SVGAzcRycLk" x1="10.667" x2="15.25" y1="5.083" y2="5.083" gradientUnits="userSpaceOnUse">
+				<stop stop-color="#eb4824" />
+				<stop offset="1" stop-color="#ffcd0f" stop-opacity=".988" />
+			</linearGradient>
+			<radialGradient id="SVGR9ICJe7V" cx="0" cy="0" r="1" gradientTransform="rotate(229.013 8.408 2.547)scale(11.5196 12.3112)" gradientUnits="userSpaceOnUse">
+				<stop stop-color="#ff6f47" />
+				<stop offset="1" stop-color="#ffcd0f" />
+			</radialGradient>
+		</defs>
+	</g>
+</svg>

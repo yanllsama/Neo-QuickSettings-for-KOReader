@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  
+    <rect x="25" y="10" width="50" height="60" rx="4" fill="#2D3748" />
+    <rect x="30" y="15" width="40" height="45" rx="2" fill="#EDF2F7" />
+    <rect x="45.0" y="64" width="10" height="2" rx="1" fill="#EDF2F7" />
+    
+  <path d="M 25 75 L 75 75 L 75 95 L 25 95 Z" fill="#4FD1C5" />
+  <path d="M 25 80 L 70 80 L 70 90 L 25 90 Z" fill="#E6FFFA" />
+  
+    <polyline points="33.0,90.4 33.0,80.0 40.2,90.4 40.2,80.0" stroke="#2D3748" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <polyline points="47.4,80.0 42.6,80.0 42.6,90.4 47.4,90.4" stroke="#2D3748" stroke-width="2" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <line x1='42.6' y1='85.2' x2='46.6' y2='85.2' stroke="#2D3748" stroke-width="2" stroke-linecap="round" />
+    <circle cx="55.400000000000006" cy="85.2" r="5.2" stroke="#2D3748" stroke-width="2" fill="none" />
+    
+  <!-- Half book on left -->
+  <path d="M 10 40 Q 25 30 50 40 L 50 70 Q 25 60 10 70 Z" fill="#81E6D9"  />
+  <path d="M 15 45 Q 30 35 50 45 L 50 65 Q 30 55 15 65 Z" fill="#319795"  />
+
+</svg>

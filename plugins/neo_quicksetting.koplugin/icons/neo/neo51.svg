@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  <line x1="20" y1="20" x2="20" y2="80" stroke="#2D3748" stroke-width="6" stroke-linecap="round" />
+  <line x1="80" y1="20" x2="80" y2="80" stroke="#2D3748" stroke-width="6" stroke-linecap="round" />
+  
+  <line x1="20" y1="50" x2="20" y2="80" stroke="#4FD1C5" stroke-width="6" stroke-linecap="round" />
+  <line x1="80" y1="30" x2="80" y2="80" stroke="#4FD1C5" stroke-width="6" stroke-linecap="round" />
+  
+  <rect x="12" y="45" width="16" height="10" rx="3" fill="#319795" />
+  <rect x="72" y="25" width="16" height="10" rx="3" fill="#319795" />
+  
+  <!-- Book in middle -->
+  <path d="M 50 60 Q 35 50 40 40 L 40 40 Q 50 45 60 40 L 60 40 Q 65 50 50 60 Z" fill="#2D3748" />
+  <line x1="50" y1="45" x2="50" y2="60" stroke="#EDF2F7" stroke-width="2" />
+
+</svg>

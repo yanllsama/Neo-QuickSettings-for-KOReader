@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+	<g fill="none">
+		<path fill="url(#SVGN9yoHdzA)" d="M11 6.5a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0" />
+		<path fill="url(#SVGhk36OCKe)" d="M9.823 10.883a5.5 5.5 0 1 1 1.06-1.06l2.897 2.897a.75.75 0 1 1-1.06 1.06zM10.5 6.5a4 4 0 1 0-8 0a4 4 0 0 0 8 0" />
+		<path fill="url(#SVGDJ9rhenh)" d="m15.783 8.213l-.765-.248a1.58 1.58 0 0 1-1-.999l-.248-.764a.302.302 0 0 0-.57 0l-.25.764a1.58 1.58 0 0 1-.983.999l-.765.248a.303.303 0 0 0 0 .57l.765.249a1.58 1.58 0 0 1 1 1.002l.248.764a.302.302 0 0 0 .57 0l.249-.764a1.58 1.58 0 0 1 .999-.999l.765-.248a.303.303 0 0 0 0-.57z" />
+		<path fill="url(#SVGELANHeLC)" d="m10.878.282l.348 1.071a2.2 2.2 0 0 0 1.398 1.397l1.072.348l.021.006a.423.423 0 0 1 0 .798l-1.071.348a2.2 2.2 0 0 0-1.399 1.397l-.348 1.07a.423.423 0 0 1-.798 0l-.348-1.07a2.2 2.2 0 0 0-1.399-1.403l-1.072-.348a.423.423 0 0 1 0-.798l1.072-.348a2.2 2.2 0 0 0 1.377-1.397l.348-1.07a.423.423 0 0 1 .799 0" />
+		<defs>
+			<radialGradient id="SVGDJ9rhenh" cx="0" cy="0" r="1" gradientTransform="rotate(63.379 11.564 -4.483)scale(28.6137 22.2808)" gradientUnits="userSpaceOnUse">
+				<stop offset=".718" stop-color="#ffcd0f" />
+				<stop offset=".991" stop-color="#e67505" />
+			</radialGradient>
+			<radialGradient id="SVGELANHeLC" cx="0" cy="0" r="1" gradientTransform="rotate(61.2 14.057 -10.24)scale(30.098 23.4366)" gradientUnits="userSpaceOnUse">
+				<stop offset=".698" stop-color="#ffcd0f" />
+				<stop offset=".991" stop-color="#e67505" />
+			</radialGradient>
+			<linearGradient id="SVGN9yoHdzA" x1="8.75" x2="2" y1="3.5" y2="11" gradientUnits="userSpaceOnUse">
+				<stop stop-color="#fdfdfd" />
+				<stop offset="1" stop-color="#b3e0ff" />
+			</linearGradient>
+			<linearGradient id="SVGhk36OCKe" x1="1.684" x2="12.632" y1="12.632" y2="3.737" gradientUnits="userSpaceOnUse">
+				<stop stop-color="#0094f0" />
+				<stop offset="1" stop-color="#29c3ff" />
+			</linearGradient>
+		</defs>
+	</g>
+</svg>

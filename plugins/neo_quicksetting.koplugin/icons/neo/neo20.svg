@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  
+    <rect x="25" y="10" width="50" height="80" rx="4" fill="#2D3748" />
+    <rect x="30" y="15" width="40" height="65" rx="2" fill="#EDF2F7" />
+    <rect x="45.0" y="84" width="10" height="2" rx="1" fill="#EDF2F7" />
+    
+  <!-- Circuit paths -->
+  <polyline points="50,60 50,45 35,45 35,35" stroke="#4FD1C5" stroke-width="2" fill="none" />
+  <polyline points="50,60 50,45 65,45 65,35" stroke="#4FD1C5" stroke-width="2" fill="none" />
+  <!-- Book source -->
+  <path d="M 50 75 Q 35 65 25 75 L 25 60 Q 35 50 50 60 Q 65 50 75 60 L 75 75 Q 65 65 50 75 Z" fill="#81E6D9" />
+  
+    <polyline points="33.0,33.0 33.0,20.0 42.0,33.0 42.0,20.0" stroke="#319795" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <polyline points="51.0,20.0 45.0,20.0 45.0,33.0 51.0,33.0" stroke="#319795" stroke-width="3" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+    <line x1='45.0' y1='26.5' x2='50.0' y2='26.5' stroke="#319795" stroke-width="3" stroke-linecap="round" />
+    <circle cx="61.0" cy="26.5" r="6.5" stroke="#319795" stroke-width="3" fill="none" />
+    
+
+</svg>

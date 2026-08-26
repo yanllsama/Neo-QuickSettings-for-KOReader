@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  <!-- Tablet -->
+  <rect x="40" y="10" width="55" height="65" rx="5" ry="5" fill="#2D3748" />
+  <rect x="45" y="15" width="45" height="45" rx="2" ry="2" fill="#EDF2F7" />
+  <rect x="60" y="66" width="15" height="3" rx="1.5" ry="1.5" fill="#EDF2F7" />
+  
+  <!-- Screen Content -->
+  
+  <!-- Digital KO -->
+  <polyline points="55,25 55,50" stroke="#319795" stroke-width="4" />
+  <polyline points="65,25 55,37 65,50" stroke="#319795" stroke-width="4" fill="none" />
+  <rect x="70" y="30" width="12" height="15" fill="none" stroke="#319795" stroke-width="4" />
+
+
+  <!-- Left Book -->
+  <path d="M 40 15 Q 22 10 5 15 L 5 60 Q 22 55 40 60 Z" fill="#81E6D9" />
+  <path d="M 45 20 Q 27 15 10 20 L 10 65 Q 27 60 45 65 Z" fill="#4FD1C5" />
+  <path d="M 50 25 Q 32 20 15 25 L 15 70 Q 32 65 50 70 Z" fill="#319795" />
+  <polyline points="20,40 30,40 30,50 40,50" fill="none" stroke="#E6FFFA" stroke-width="2" />
+
+  <!-- Overlay Mods -->
+  
+
+  <!-- NEO Text -->
+  <polyline points="28,95 28,80 40,95 40,80" stroke="#319795" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+  <polyline points="53,80 45,80 45,95 53,95" stroke="#319795" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round" />
+  <line x1="45" y1="87.5" x2="51" y2="87.5" stroke="#319795" stroke-width="4" stroke-linecap="round" />
+  <circle cx="65.5" cy="87.5" r="7.5" stroke="#319795" stroke-width="4" fill="none" />
+
+</svg>

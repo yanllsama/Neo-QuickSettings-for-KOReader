@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+
+  <rect x="10" y="40" width="80" height="20" rx="10" fill="#2D3748" />
+  <!-- Center marker -->
+  <line x1="50" y1="30" x2="50" y2="70" stroke="#319795" stroke-width="4" stroke-dasharray="2 2" />
+  <!-- Fader knob -->
+  <rect x="30" y="30" width="15" height="40" rx="4" fill="#EDF2F7" stroke="#4FD1C5" stroke-width="4" />
+  <line x1="37.5" y1="40" x2="37.5" y2="60" stroke="#4FD1C5" stroke-width="3" />
+
+</svg>
