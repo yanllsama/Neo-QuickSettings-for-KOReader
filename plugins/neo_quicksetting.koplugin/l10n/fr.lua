@@ -369,4 +369,5 @@ return {
     ["Show Min/Max Slider Buttons"] = "Afficher les boutons de curseur Min/Max",
     ["Language"] = "Langue",
     ["System Language"] = "Langue du système",
+    ["Show Min/Max Buttons (Brightness/Warmth)"] = "Afficher boutons Min/Max",
 }

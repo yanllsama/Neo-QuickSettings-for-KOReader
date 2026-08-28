@@ -369,4 +369,5 @@ return {
     ["Show Min/Max Slider Buttons"] = "Показывать кнопки Мин/Макс ползунка",
     ["Language"] = "Язык",
     ["System Language"] = "Системный язык",
+    ["Show Min/Max Buttons (Brightness/Warmth)"] = "Показать кнопки Мин/Макс",
 }

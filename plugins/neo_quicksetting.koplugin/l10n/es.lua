@@ -362,4 +362,5 @@ return {
     ["Show Min/Max Slider Buttons"] = "Mostrar botones Mín/Máx en deslizadores",
     ["Language"] = "Idioma",
     ["System Language"] = "Idioma del sistema",
+    ["Show Min/Max Buttons (Brightness/Warmth)"] = "Mostrar botones Mín/Máx",
 }

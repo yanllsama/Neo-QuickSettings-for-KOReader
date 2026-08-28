@@ -364,4 +364,5 @@ return {
     ["Show Min/Max Slider Buttons"] = "Min/Max Schieberegler-Buttons anzeigen",
     ["Language"] = "Sprache",
     ["System Language"] = "Systemsprache",
+    ["Show Min/Max Buttons (Brightness/Warmth)"] = "Min/Max-Tasten anzeigen",
 }

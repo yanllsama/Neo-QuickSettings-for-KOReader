@@ -1409,16 +1409,19 @@ local function createQuickSettingsPanel(touch_menu)
     local small_btn_width = Screen:scaleBySize(56)
     local slider_gap      = Screen:scaleBySize(4)
     local cap_label_w     = Screen:scaleBySize(28)   -- matches cap_font text
+    local show_min_max = (config.show_minmax_buttons == true or config.show_minmax_buttons == nil)
     local slider_width    = inner_width
                             - 2 * small_btn_width   -- minus/plus buttons
                             - 2 * slider_gap        -- gaps beside slider
-                            - 2 * cap_label_w       -- min/max label columns
-                            - 2 * Screen:scaleBySize(2)  -- inner spans
+    if show_min_max then
+        slider_width = slider_width - 2 * cap_label_w - 2 * Screen:scaleBySize(2)
+    end
     local show_parent     = touch_menu.show_parent
 
     local slider_opts = {
         inner_width     = inner_width,
         slider_width    = slider_width,
+        show_min_max    = show_min_max,
         small_btn_width = small_btn_width,
         slider_gap      = slider_gap,
         medium_font     = medium_font,

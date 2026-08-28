@@ -369,4 +369,5 @@ return {
     ["Show Min/Max Slider Buttons"] = "إظهار أزرار تمرير الحد الأدنى/الأقصى",
     ["Language"] = "اللغة",
     ["System Language"] = "لغة النظام",
+    ["Show Min/Max Buttons (Brightness/Warmth)"] = "إظهار أزرار الأدنى/الأقصى",
 }

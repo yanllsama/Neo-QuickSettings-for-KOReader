@@ -369,4 +369,5 @@ return {
     ["Show Min/Max Slider Buttons"] = "Show Min/Max Slider Buttons",
     ["Language"] = "Language",
     ["System Language"] = "System Language",
+    ["Show Min/Max Buttons (Brightness/Warmth)"] = "Show Min/Max Buttons",
 }

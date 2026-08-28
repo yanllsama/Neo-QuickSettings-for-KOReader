@@ -369,4 +369,5 @@ return {
     ["Show Min/Max Slider Buttons"] = "最小/最大スライダーボタンを表示",
     ["Language"] = "言語",
     ["System Language"] = "システム言語",
+    ["Show Min/Max Buttons (Brightness/Warmth)"] = "最小/最大ボタンを表示",
 }

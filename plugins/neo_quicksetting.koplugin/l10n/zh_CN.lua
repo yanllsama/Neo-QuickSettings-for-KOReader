@@ -369,4 +369,5 @@ return {
     ["Show Min/Max Slider Buttons"] = "显示最小/最大滑块按钮",
     ["Language"] = "语言",
     ["System Language"] = "系统语言",
+    ["Show Min/Max Buttons (Brightness/Warmth)"] = "显示最小/最大按钮",
 }

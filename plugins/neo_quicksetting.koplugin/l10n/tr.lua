@@ -389,4 +389,5 @@ return {
     ["Show Min/Max Slider Buttons"] = "Min/Max Kaydırma Butonlarını Göster",
     ["Language"] = "Dil",
     ["System Language"] = "Sistem Dili",
+    ["Show Min/Max Buttons (Brightness/Warmth)"] = "Min/Max Butonları Göster",
 }
