@@ -1,3 +1,10 @@
+<p align="center">
+  <img src="pics/5.png" alt="">
+  <img src="pics/1.png" alt="">
+  <img src="pics/11.png" alt="">
+  <img src="pics/10.png" alt="">
+</p>
+
 # Neo QuickSettings for KOReader
 
 A highly customizable, powerful, and visually rich quick settings panel plugin for KOReader. **Neo QuickSettings** redefines how you interact with your device by giving you full control over your shortcuts, sliders, and UI appearance.
