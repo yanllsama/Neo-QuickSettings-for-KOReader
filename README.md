@@ -1,5 +1,6 @@
 <p align="center">
   <img src="pics/4.png" alt="">
+  <img src="pics/11.png" alt="">
 </p>
 
 # Neo QuickSettings for KOReader
