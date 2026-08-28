@@ -134,50 +134,60 @@ local function build_brightness_slider(touch_menu, opts)
     local row_gap = VerticalSpan:new{ width = Screen:scaleBySize(10) }
 
     local cap_font = library_font.getFontName()
-    local min_btn = Button:new{
-        text           = "min",
-        text_font_face = cap_font,
-        text_font_size = 12,
-        text_font_bold = false,
-        width          = cap_label_w,
-        bordersize     = 0,
-        show_parent    = show_parent,
-        callback       = function() setBrightness(fl.min) end,
-    }
-    local max_btn = Button:new{
-        text           = "max",
-        text_font_face = cap_font,
-        text_font_size = 12,
-        text_font_bold = false,
-        width          = cap_label_w,
-        bordersize     = 0,
-        show_parent    = show_parent,
-        callback       = function() setBrightness(fl.max) end,
-    }
-    local cap_h  = math.max(fl_label_h, min_btn:getSize().h)
+    local min_btn = nil
+    local max_btn = nil
+    local cap_h = fl_label_h
+
+    if opts.show_min_max then
+        min_btn = Button:new{
+            text           = "min",
+            text_font_face = cap_font,
+            text_font_size = 12,
+            text_font_bold = false,
+            width          = cap_label_w,
+            bordersize     = 0,
+            show_parent    = show_parent,
+            callback       = function() setBrightness(fl.min) end,
+        }
+        max_btn = Button:new{
+            text           = "max",
+            text_font_face = cap_font,
+            text_font_size = 12,
+            text_font_bold = false,
+            width          = cap_label_w,
+            bordersize     = 0,
+            show_parent    = show_parent,
+            callback       = function() setBrightness(fl.max) end,
+        }
+        cap_h = math.max(fl_label_h, min_btn:getSize().h)
+    end
 
     local fl_cap_row = CenterContainer:new{
         dimen = Geom:new{ w = inner_width, h = fl_label_h },
         fl_label_group,
     }
-    fl_row = HorizontalGroup:new{
-        align = "center",
-        CenterContainer:new{
+
+    local row_items = { align = "center" }
+    if opts.show_min_max then
+        table.insert(row_items, CenterContainer:new{
             dimen = Geom:new{ w = cap_label_w, h = cap_h },
             min_btn,
-        },
-        HorizontalSpan:new{ width = Screen:scaleBySize(2) },
-        fl_minus,
-        HorizontalSpan:new{ width = slider_gap },
-        fl_progress,
-        HorizontalSpan:new{ width = slider_gap },
-        fl_plus,
-        HorizontalSpan:new{ width = Screen:scaleBySize(2) },
-        CenterContainer:new{
+        })
+        table.insert(row_items, HorizontalSpan:new{ width = Screen:scaleBySize(2) })
+    end
+    table.insert(row_items, fl_minus)
+    table.insert(row_items, HorizontalSpan:new{ width = slider_gap })
+    table.insert(row_items, fl_progress)
+    table.insert(row_items, HorizontalSpan:new{ width = slider_gap })
+    table.insert(row_items, fl_plus)
+    if opts.show_min_max then
+        table.insert(row_items, HorizontalSpan:new{ width = Screen:scaleBySize(2) })
+        table.insert(row_items, CenterContainer:new{
             dimen = Geom:new{ w = cap_label_w, h = cap_h },
             max_btn,
-        },
-    }
+        })
+    end
+    fl_row = HorizontalGroup:new(row_items)
 
     refs.fl_progress   = fl_progress
     refs.fl_state      = fl

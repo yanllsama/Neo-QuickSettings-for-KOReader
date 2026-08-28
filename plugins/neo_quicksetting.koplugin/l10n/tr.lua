@@ -1,8 +1,8 @@
-﻿return {
+return {
     ["Favorites"] = "Favoriler",
     ["Rounded square"] = "Yuvarlatılmış kare",
     ["Tabler"] = "Tabler",
-    ["Show as default tab when menu opens"] = "Menü açıldığında varsayılan sekme olarak göster",
+    ["Show as default tab when menu opens"] = "Menüde varsayılan sekme olarak göster",
     ["FontAwesome Solid"] = "FontAwesome Dolgulu",
     ["Search icon (English word)"] = "İkon ara (İngilizce kelime)",
     ["Go to page"] = "Sayfaya git",
@@ -111,7 +111,7 @@
     ["Delete"] = "Sil",
     ["Hidden   (tap to show)"] = "Gizli   (göstermek için dokunun)",
     ["Collections"] = "Koleksiyonlar",
-    ["🔍 Search on WEB"] = "🔍 İnternette Ara",
+    ["?? Search on WEB"] = "?? İnternette Ara",
     ["Sleep Screen"] = "Uyku Ekranı",
     ["BookFusion"] = "BookFusion",
     ["Book cover - black background"] = "Kitap kapağı - siyah arka plan",
@@ -125,7 +125,7 @@
     ["Action: None"] = "Eylem: Yok",
     ["Convert to Fixed Button"] = "Sabit Butona Dönüştür",
     ["Choose which tabs appear in your navigation bar.\nYou can rearrange or adjust these anytime in Settings."] = "Gezinme çubuğunda hangi sekmelerin görüneceğini seçin.\nBunları istediğiniz zaman Ayarlar'dan yeniden düzenleyebilirsiniz.",
-    ["🧹 Clear Search History"] = "🧹 Arama Geçmişini Temizle",
+    ["?? Clear Search History"] = "?? Arama Geçmişini Temizle",
     ["Save"] = "Kaydet",
     ["Status Bar"] = "Durum Çubuğu",
     ["24-hour  (15:30)"] = "24-hour  (15:30)",
@@ -162,7 +162,7 @@
     ["Details"] = "Detaylar",
     ["Home Folder"] = "Ana Klasör",
     ["Keep existing settings"] = "Mevcut ayarları koru",
-    ["← Discard"] = "← İptal Et / Geri Al",
+    ["‹ Discard"] = "‹ İptal Et / Geri Al",
     ["Swipe to exit"] = "Çıkmak için kaydır",
     ["Brightness"] = "Parlaklık",
     ["Material Design"] = "Material Design",
@@ -174,11 +174,11 @@
     ["Which time format do you prefer?"] = "Which time format do you prefer?",
     ["All Sources (Legacy)"] = "Tüm Kaynaklar (Eski)",
     ["12-hour  (3:30 PM)"] = "12-hour  (3:30 PM)",
-    ["✓ Save changes"] = "✓ Değişiklikleri Kaydet",
+    ["? Save changes"] = "? Değişiklikleri Kaydet",
     ["Icons"] = "İkonlar",
     ["Are you sure you want to convert this custom button to a fixed button?\n\nIt will be moved from the custom buttons menu to the fixed buttons list."] = "Bu özel butonu sabit bir butona dönüştürmek istediğinizden emin misiniz?\n\nÖzel butonlar menüsünden sabit butonlar listesine taşınacaktır.",
     ["Navigation Bar"] = "Gezinme Çubuğu",
-    ["Visible ✓ (tap to hide)"] = "Visible ✓ (tap to hide)",
+    ["Visible ? (tap to hide)"] = "Visible ? (tap to hide)",
     ["Icon size"] = "İkon boyutu",
     ["Series"] = "Seriler",
     ["Swipe to start"] = "Başlamak için kaydır",
@@ -221,7 +221,7 @@
     ["Square Notched"] = "Kare Çentikli",
     ["Change Name"] = "İsmi Değiştir",
     ["Reset All Names and Icons"] = "Tüm İsimleri ve İkonları Sıfırla",
-    ["Visible ✓ (tap to hide)"] = "Görünür ✓ (gizlemek için dokunun)",
+    ["Visible ? (tap to hide)"] = "Görünür ? (gizlemek için dokunun)",
     ["Name: "] = "İsim: ",
     ["Icon Search Source"] = "İkon Arama Kaynağı",
     ["Search icon (English word)"] = "İkon ara (İngilizce kelime)",
@@ -243,7 +243,7 @@
     ["Pearls"] = "İnci Dizisi",
     ["Piano Keys"] = "Piyano Tuşları",
 
-    -- ── Capture Mode (Menü Kısayolu Yakalama) ─────────────────────────────
+    -- ¦¦ Capture Mode (Menü Kısayolu Yakalama) ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
     ["Capture Menu Item (Neo)"] = "Menü Öğesi Yakala (Neo)",
     ["Navigate to any KOReader menu and LONG PRESS an item!"] = "Herhangi bir KOReader menüsüne gidin ve bir öğeye UZUN BASIN!",
     ["Action captured successfully!"] = "Eylem başarıyla yakalandı!",
@@ -253,28 +253,28 @@
     ["Menu item not found: "] = "Menü öğesi bulunamadı: ",
     ["Menu: "] = "Menü: ",
 
-    -- ── İkon Picker - Yeni Butonlar ────────────────────────────────────────
-    ["🔍 Search Online"] = "🔍 İnternette Ara",
-    ["🔎 Filter by Name"] = "🔎 Ada Göre Filtrele",
-    ["⬇  Load More"] = "⬇  Daha Fazla Yükle",
+    -- ¦¦ İkon Picker - Yeni Butonlar ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
+    ["?? Search Online"] = "?? İnternette Ara",
+    ["?? Filter by Name"] = "?? Ada Göre Filtrele",
+    ["?  Load More"] = "?  Daha Fazla Yükle",
 
-    -- ── İkon Picker - Kaynaklar ────────────────────────────────────────────
+    -- ¦¦ İkon Picker - Kaynaklar ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
     ["Choose Icon Source"] = "İkon Kaynağı Seç",
-    ["⭐  Best Mix (Recommended)"] = "⭐  En İyiler (Önerilen)",
-    ["🔤  Material Symbols (Google)"] = "🔤  Material Semboller (Google)",
-    ["🔤  Material Symbols Sharp"] = "🔤  Material Semboller Keskin",
-    ["🎨  Material Design Icons"] = "🎨  Material Tasarım İkonları",
-    ["💎  Phosphor Icons"] = "💎  Phosphor İkonları",
-    ["📐  Tabler Icons"] = "📐  Tabler İkonları",
-    ["🔷  Lucide Icons"] = "🔷  Lucide İkonları",
-    ["⚡  Heroicons"] = "⚡  Heroicons",
-    ["🔴  Font Awesome Solid"] = "🔴  Font Awesome Dolgulu",
-    ["🪟  Fluent UI (Microsoft)"] = "🪟  Fluent UI (Microsoft)",
-    ["📦  Boxicons Solid"] = "📦  Boxicons Dolgulu",
-    ["🌑  Dark / Solid Mix"] = "🌑  Koyu / Dolgulu Karma",
-    ["🌐  All Sources"] = "🌐  Tüm Kaynaklar",
+    ["?  Best Mix (Recommended)"] = "?  En İyiler (Önerilen)",
+    ["??  Material Symbols (Google)"] = "??  Material Semboller (Google)",
+    ["??  Material Symbols Sharp"] = "??  Material Semboller Keskin",
+    ["??  Material Design Icons"] = "??  Material Tasarım İkonları",
+    ["??  Phosphor Icons"] = "??  Phosphor İkonları",
+    ["??  Tabler Icons"] = "??  Tabler İkonları",
+    ["??  Lucide Icons"] = "??  Lucide İkonları",
+    ["?  Heroicons"] = "?  Heroicons",
+    ["??  Font Awesome Solid"] = "??  Font Awesome Dolgulu",
+    ["??  Fluent UI (Microsoft)"] = "??  Fluent UI (Microsoft)",
+    ["??  Boxicons Solid"] = "??  Boxicons Dolgulu",
+    ["??  Dark / Solid Mix"] = "??  Koyu / Dolgulu Karma",
+    ["??  All Sources"] = "??  Tüm Kaynaklar",
 
-    -- ── İkon Picker - Arama & İndirme ──────────────────────────────────────
+    -- ¦¦ İkon Picker - Arama & İndirme ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
     ["Search icons (English keyword)"] = "İkon ara (İngilizce anahtar kelime)",
     ["Searching icons\226\128\166 Please wait."] = "İkonlar aranıyor\226\128\166 Lütfen bekleyin.",
     ["Connection error. Code: "] = "Bağlantı hatası. Kod: ",
@@ -285,24 +285,24 @@
     ["Icons already cached."] = "İkonlar zaten önbellekte.",
     ["Search history cleared."] = "Arama geçmişi temizlendi.",
 
-    -- ── İkon Picker - Filtre ───────────────────────────────────────────────
+    -- ¦¦ İkon Picker - Filtre ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
     ["Filter icons by name"] = "İkonları ada göre filtrele",
     ["Type to filter\226\128\166"] = "Filtrelemek için yazın\226\128\166",
     ["Filter: "] = "Filtre: ",
     ["Filter: (none)"] = "Filtre: (yok)",
     ["Clear"] = "Temizle",
 
-    -- ── İkon Picker - Kaydetme ─────────────────────────────────────────────
+    -- ¦¦ İkon Picker - Kaydetme ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
     ["Save to folder (name):"] = "Klasöre kaydet (ad):",
     ["E.g.: custom, my_icons"] = "Örn: ozel, ikonlarim",
 
-    -- ── İkon Silme (Uzun Bas) ──────────────────────────────────────────────
+    -- ¦¦ İkon Silme (Uzun Bas) ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
     ["Built-in icons cannot be deleted."] = "Yerleşik ikonlar silinemez.",
     ["Delete icon?"] = "İkonu sil?",
     ["Icon deleted."] = "İkon silindi.",
 
-    -- ── Eksik (Kalan) Çeviriler ────────────────────────────────────────────
-    [" · Tap ⬇ for more"] = " · Daha fazla için ⬇ dokunun",
+    -- ¦¦ Eksik (Kalan) Çeviriler ¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦¦
+    [" · Tap ? for more"] = " · Daha fazla için ? dokunun",
     ["Navigate to your desired option and Long Press it!"] = "İstediğiniz menü öğesine gidin ve UZUN BASIN!",
     ["Searching icons… Please wait."] = "İkonlar aranıyor… Lütfen bekleyin.",
     ["Type to filter…"] = "Filtrelemek için yazın…",
@@ -337,7 +337,7 @@
     ["Icon saved."] = "İkon kaydedildi.",
     ["Ex: my_icon_name"] = "Örn: benim_ikonum",
     ["Icon Name (No extension):"] = "İkon Adı (Uzantı yazmayın):",
-    -- ── Okuma Hedefleri ve Hatırlatıcılar (Reading Goals & Reminders) ──
+    -- ¦¦ Okuma Hedefleri ve Hatırlatıcılar (Reading Goals & Reminders) ¦¦
     ["Time Goal"] = "Süre Hedefi",
     ["Time goal started: "] = "Süre hedefi başlatıldı: ",
     [" min"] = " dk",
@@ -386,5 +386,7 @@
     ["Reading Page Goal"] = "Okuma Sayfa Hedefi",
     ["Start"] = "Başlat",
     ["No"] = "Hayır",
+    ["Show Min/Max Slider Buttons"] = "Min/Max Kaydırma Butonlarını Göster",
+    ["Language"] = "Dil",
+    ["System Language"] = "Sistem Dili",
 }
-

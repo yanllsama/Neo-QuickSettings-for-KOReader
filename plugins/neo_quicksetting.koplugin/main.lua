@@ -485,6 +485,88 @@ local function showTopRightToast(msg)
     end)
 end
 
+local function isReadingActive()
+    local UIManager = require("ui/uimanager")
+    if not UIManager._window_stack then return false end
+    if NeoQuickSettings._is_suspended then return false end
+    
+    local reader_idx = 0
+    
+    for i = 1, #UIManager._window_stack do
+        local w = UIManager._window_stack[i].widget
+        if w then
+            local name = tostring(w.name or "")
+            local id = tostring(w.id or "")
+            if name == "ReaderUI" or id == "ReaderUI" then
+                reader_idx = i
+                break
+            end
+        end
+    end
+    
+    if reader_idx == 0 then return false end
+    
+    local reader_ui = UIManager._window_stack[reader_idx].widget
+    
+    -- Check KOReader's internal menu states
+    if reader_ui and type(reader_ui.ui) == "table" then
+        if reader_ui.ui.menu and reader_ui.ui.menu.show_menu then return false end
+        if reader_ui.ui.dictionary and reader_ui.ui.dictionary.show then return false end
+        if reader_ui.ui.toc and reader_ui.ui.toc.show then return false end
+        if reader_ui.ui.bookmark and reader_ui.ui.bookmark.show then return false end
+    end
+    
+    local has_menu = false
+    
+    for i = reader_idx + 1, #UIManager._window_stack do
+        local w = UIManager._window_stack[i].widget
+        if w then
+            local name = tostring(w.name or ""):lower()
+            local id = tostring(w.id or ""):lower()
+            local title = tostring(w.title or w.title_text or ""):lower()
+            
+            -- Ignore known transparent overlays
+            if name:match("bookends") or id:match("bookends") or name:match("halo") then
+                -- skip this harmless overlay
+            else
+                -- Is this unknown widget a menu?
+                
+                -- 1. Keyword check
+                if name:match("menu") or id:match("menu") or title:match("menu") or title:match("menü") or
+                   name:match("dialog") or id:match("dialog") or
+                   name:match("box") or id:match("box") or
+                   name:match("popup") or id:match("popup") or
+                   name:match("manager") or id:match("manager") or
+                   name:match("settings") or id:match("settings") or title:match("ayarlar") or
+                   name:match("dict") or id:match("dict") or title:match("sözlük") or
+                   name:match("keyboard") or id:match("keyboard") or
+                   name:match("simpleui") or id:match("simpleui") or
+                   name:match("bento") or id:match("bento") then
+                    has_menu = true
+                end
+                
+                -- 2. Property check
+                if w.menu_items or w.items or w.buttons or w.dim ~= nil or w.show_menu then
+                    has_menu = true
+                end
+                
+                -- 3. Visual & Structure check (The Ultimate Catch-All for SimpleUI and Unknown Menus)
+                -- If it has a background color, it blocks the screen -> Menu
+                if w.background or w.bg_color then
+                    has_menu = true
+                end
+                -- If it contains child widgets (buttons, icons, layouts), it's a UI Container -> Menu
+                -- Pure gesture overlays have no children.
+                if w[1] ~= nil then
+                    has_menu = true
+                end
+            end
+        end
+    end
+    
+    return not has_menu
+end
+
 local function getActiveReaderUI()
     local UIManager = require("ui/uimanager")
     if UIManager._window_stack then
@@ -2458,6 +2540,12 @@ buildSettingsMenuItems = function()
                         end
                     },
                     {
+                        text = _("Show Min/Max Buttons (Brightness/Warmth)"), 
+                        checked_func = function() return config.show_minmax_buttons ~= false end, 
+                        ios_toggle = true, 
+                        callback = function() config.show_minmax_buttons = (config.show_minmax_buttons == false) saveConfigAndRefresh() end 
+                    },
+                    {
                         text = _("Change Order (Drag & Drop)"),
                         callback = function(tm)
                             local SortWidget = require("ui/widget/sortwidget")
@@ -2740,6 +2828,24 @@ buildSettingsMenuItems = function()
                             { text = _("Piano Keys"), checked_func = function() return config.slider_style == "piano" end, callback = function() config.slider_style = "piano"; saveConfigAndRefresh() end },
             }
         end,
+    })
+
+        table.insert(slider_items, {
+        text = _("Language"),
+        sub_item_table_func = function()
+            local items = {
+                { text = _("System Language"), checked_func = function() return (not config.plugin_language or config.plugin_language == "system") end, callback = function() config.plugin_language = "system"; saveConfigAndRefresh(); require("ui/uimanager"):show(require("ui/widget/infomessage"):new{text=_("Please restart KOReader to apply language changes"), timeout=3}) end }
+            }
+            local langs = {
+                {"en", "English"}, {"tr", "Türkçe"}, {"es", "Español"}, {"fr", "Français"}, {"de", "Deutsch"},
+                {"it", "Italiano"}, {"ru", "Русский"}, {"ja", "日本語"}, {"zh_CN", "简体中文"}, {"pt_BR", "Português (Brasil)"},
+                {"ko", "한국어"}, {"ar", "العربية"}, {"hi", "हिन्दी"}
+            }
+            for idx, lang in ipairs(langs) do
+                table.insert(items, { text = lang[2], checked_func = function() return config.plugin_language == lang[1] end, callback = function() config.plugin_language = lang[1]; saveConfigAndRefresh(); require("ui/uimanager"):show(require("ui/widget/infomessage"):new{text=_("Please restart KOReader to apply language changes"), timeout=3}) end })
+            end
+            return items
+        end
     })
 
     table.insert(slider_items, {
@@ -3765,90 +3871,111 @@ end
 function NeoQuickSettings:onReaderReady()
     NeoQuickSettings.session_pages_read = 0
     NeoQuickSettings.session_time_read = 0
+    NeoQuickSettings._session_seconds = 0
     
     if self.progress_timer then
         require("ui/uimanager"):unschedule(self.progress_timer)
     end
     
+    local startup = true
     local function progressTick()
-        if not getActiveReaderUI() then
-            self.progress_timer = require("ui/uimanager"):scheduleIn(60, progressTick)
+        if startup then
+            startup = false
+            require("ui/uimanager"):scheduleIn(10, progressTick)
             return
         end
-        NeoQuickSettings.session_time_read = (NeoQuickSettings.session_time_read or 0) + 1
         
-        if NeoQuickSettings.time_goal_remaining then
-            NeoQuickSettings.time_goal_remaining = NeoQuickSettings.time_goal_remaining - 1
-        end
+        require("ui/uimanager"):scheduleIn(10, progressTick)
         
-        local r = NeoQuickSettings.time_goal_remaining
-        local tr = NeoQuickSettings.session_time_read
-        local trigger_prog = false
-        local trigger_goal = false
+        if NeoQuickSettings._is_suspended then return end
+        if not isReadingActive() then return end
         
-        if config and config.progress_time and config.progress_time[tostring(tr)] then
-            trigger_prog = true
-        end
-        if r and config and config.reminders_time and config.reminders_time[tostring(r)] then
-            trigger_goal = true
-        end
-        
-        if trigger_prog or trigger_goal then
-            local msg
-            if trigger_prog and trigger_goal and r and r > 0 then
-                msg = _("Read time: ") .. tr .. _(" min\nTime to goal: ") .. r .. _(" min")
-            elseif trigger_prog then
-                msg = _("Read time: ") .. tr .. _(" min")
-            elseif trigger_goal and r and r > 0 then
-                msg = _("Time to goal: ") .. r .. _(" min")
+        NeoQuickSettings._session_seconds = (NeoQuickSettings._session_seconds or 0) + 10
+        if NeoQuickSettings._session_seconds >= 60 then
+            NeoQuickSettings._session_seconds = NeoQuickSettings._session_seconds - 60
+            NeoQuickSettings.session_time_read = (NeoQuickSettings.session_time_read or 0) + 1
+            
+            if NeoQuickSettings.time_goal_remaining then
+                NeoQuickSettings.time_goal_remaining = NeoQuickSettings.time_goal_remaining - 1
             end
-            if msg then showTopRightToast(msg) end
-        end
-        
-        if NeoQuickSettings.time_goal_remaining and NeoQuickSettings.time_goal_remaining <= 0 then
-            NeoQuickSettings.time_goal_remaining = nil
-            NeoQuickSettings.time_goal_id = nil
-            local ButtonDialog = require("ui/widget/buttondialog")
-            local d
-            d = ButtonDialog:new{
-                title = _("Time goal reached!\n\nDo you want to set a new goal?"),
-                title_align = "center",
-                use_info_style = false,
-                buttons = {
-                    {
+            
+            local r = NeoQuickSettings.time_goal_remaining
+            local tr = NeoQuickSettings.session_time_read
+            local trigger_prog = false
+            local trigger_goal = false
+            
+            if config and config.progress_time and config.progress_time[tostring(tr)] then
+                trigger_prog = true
+            end
+            if r and config and config.reminders_time and config.reminders_time[tostring(r)] then
+                trigger_goal = true
+            end
+            
+            if trigger_prog or trigger_goal then
+                local msg
+                if trigger_prog and trigger_goal and r and r > 0 then
+                    msg = _("Read time: ") .. tr .. _(" min\nTime to goal: ") .. r .. _(" min")
+                elseif trigger_prog then
+                    msg = _("Read time: ") .. tr .. _(" min")
+                elseif trigger_goal and r and r > 0 then
+                    msg = _("Time to goal: ") .. r .. _(" min")
+                end
+                if msg then showTopRightToast(msg) end
+            end
+            
+            if NeoQuickSettings.time_goal_remaining and NeoQuickSettings.time_goal_remaining <= 0 then
+                NeoQuickSettings.time_goal_remaining = nil
+                NeoQuickSettings.time_goal_id = nil
+                local ButtonDialog = require("ui/widget/buttondialog")
+                local d
+                d = ButtonDialog:new{
+                    title = _("Time goal reached!\n\nDo you want to set a new goal?"),
+                    title_align = "center",
+                    use_info_style = false,
+                    buttons = {
                         {
-                            text = _("Yes"),
-                            callback = function()
-                                require("ui/uimanager"):close(d)
-                                if button_defs and button_defs.read_goal_time then
-                                    button_defs.read_goal_time.callback()
-                                end
-                            end,
-                        }
-                    },
-                    {
+                            {
+                                text = _("Yes"),
+                                callback = function()
+                                    require("ui/uimanager"):close(d)
+                                    if button_defs and button_defs.read_goal_time then
+                                        button_defs.read_goal_time.callback()
+                                    end
+                                end,
+                            }
+                        },
                         {
-                            text = _("No"),
-                            callback = function()
-                                require("ui/uimanager"):close(d)
-                            end,
+                            {
+                                text = _("No"),
+                                callback = function()
+                                    require("ui/uimanager"):close(d)
+                                end,
+                            }
                         }
                     }
                 }
-            }
-            require("ui/uimanager"):show(d)
+                require("ui/uimanager"):show(d)
+            end
         end
-        
-        self.progress_timer = require("ui/uimanager"):scheduleIn(60, progressTick)
     end
-    self.progress_timer = require("ui/uimanager"):scheduleIn(60, progressTick)
+    self.progress_timer = progressTick
+    -- Start 3 seconds after opening the book
+    require("ui/uimanager"):scheduleIn(3, progressTick)
 end
 
+function NeoQuickSettings:onSuspend()
+    NeoQuickSettings._is_suspended = true
+end
+
+function NeoQuickSettings:onResume()
+    NeoQuickSettings._is_suspended = false
+end
 function NeoQuickSettings:onCloseDocument()
     if self.progress_timer then
         require("ui/uimanager"):unschedule(self.progress_timer)
         self.progress_timer = nil
     end
+    NeoQuickSettings._session_seconds = 0
     NeoQuickSettings.time_goal_remaining = nil
     NeoQuickSettings.time_goal_id = nil
     NeoQuickSettings.page_goal_remaining = nil
